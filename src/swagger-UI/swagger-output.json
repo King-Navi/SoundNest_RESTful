@@ -1,0 +1,954 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "SoundNest API",
+    "description": "Documentación de mi API RESTful",
+    "version": "1.0.0"
+  },
+  "host": "localhost:6969",
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Endpoint para login de usuario",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "user@example.com"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "123456"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/auth/sendCodeEmail": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Sends a confirmation code to the user\\'s email.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "user@example.com"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Code sent successfully"
+          },
+          "400": {
+            "description": "Failed to send code"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/auth/verifiCode": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Verifies the confirmation code sent to the user\\'s email. Delete the code after",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "user@example.com"
+                },
+                "code": {
+                  "type": "number",
+                  "example": 123456
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Code verified successfully"
+          },
+          "400": {
+            "description": "Invalid or expired code"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/user/newUser": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "description": "Creates a new user. Deletes the code sent to the email after validation.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "nameUser": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "example": {
+                      "type": "string",
+                      "example": "Juan Pérez"
+                    }
+                  }
+                },
+                "email": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "example": {
+                      "type": "string",
+                      "example": "juan@example.com"
+                    }
+                  }
+                },
+                "password": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "example": {
+                      "type": "string",
+                      "example": "contraseña256"
+                    }
+                  }
+                },
+                "code": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "example": {
+                      "type": "string",
+                      "example": "a1B2c3"
+                    }
+                  }
+                },
+                "additionalInformation": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "object"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "properties": {
+                      "type": "object",
+                      "properties": {
+                        "bio": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "example": {
+                              "type": "string",
+                              "example": "I love electronic music"
+                            }
+                          }
+                        },
+                        "instagram": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "example": {
+                              "type": "string",
+                              "example": "@juan_music"
+                            }
+                          }
+                        },
+                        "genres": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "array"
+                            },
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "example": "string"
+                                }
+                              }
+                            },
+                            "example": {
+                              "type": "array",
+                              "example": [
+                                "rock",
+                                "electronic"
+                              ],
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "additionalProperties": {
+                          "type": "boolean",
+                          "example": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User created successfully (no content)"
+          },
+          "400": {
+            "description": "Invalid or missing data"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/user/editUser": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "description": "Edit the authenticated user. All fields are optional; only provided fields will be updated.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "nameUser": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "example": {
+                      "type": "string",
+                      "example": "Juan Pérez"
+                    }
+                  }
+                },
+                "email": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "example": {
+                      "type": "string",
+                      "example": "juan@example.com"
+                    }
+                  }
+                },
+                "password": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "example": {
+                      "type": "string",
+                      "example": "newPassword123"
+                    }
+                  }
+                },
+                "additionalInformation": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "object"
+                    },
+                    "additionalProperties": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "example": {
+                      "type": "object",
+                      "properties": {
+                        "bio": {
+                          "type": "string",
+                          "example": "I love electronic music"
+                        },
+                        "instagram": {
+                          "type": "string",
+                          "example": "@juan_music"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User updated successfully"
+          },
+          "400": {
+            "description": "Invalid or missing fields"
+          },
+          "401": {
+            "description": "Unauthorized, no token provided"
+          },
+          "403": {
+            "description": "Invalid or expired token"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/api/comment/comment": {
+      "post": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Crear un comentario",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Cuerpo del comentario",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "object"
+                },
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "song_id": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "integer"
+                        },
+                        "example": {
+                          "type": "number",
+                          "example": 123
+                        }
+                      }
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "any"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "any"
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": {
+                  "type": "array",
+                  "example": [
+                    "song_id",
+                    "user",
+                    "message"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Comentario creado exitosamente"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      }
+    },
+    "/api/comment/getComment/{song_id}/comments": {
+      "get": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Obtener comentarios por ID de canción",
+        "description": "",
+        "parameters": [
+          {
+            "name": "song_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID de la canción (ej: 1231231)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de comentarios",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "example": "681f473536ee5347ec38543c"
+                  },
+                  "song_id": {
+                    "type": "number",
+                    "example": 213
+                  },
+                  "user": {
+                    "type": "string",
+                    "example": "Pepe"
+                  },
+                  "message": {
+                    "type": "string",
+                    "example": "Prueba"
+                  },
+                  "parent_id": {},
+                  "timestamp": {
+                    "type": "string",
+                    "example": "2025-05-10T12:31:49.254Z"
+                  },
+                  "responses": {
+                    "type": "array",
+                    "example": [],
+                    "items": {}
+                  },
+                  "__v": {
+                    "type": "number",
+                    "example": 0
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "No se encontraron comentarios"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      }
+    },
+    "/api/comment/getComment/comment/{id}": {
+      "get": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Obtener comentario por ID",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID del comentario (ej: 681457a757562da3002c02d6)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalle del comentario",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "example": "681f473536ee5347ec38543c"
+                },
+                "song_id": {
+                  "type": "number",
+                  "example": 213
+                },
+                "user": {
+                  "type": "string",
+                  "example": "Pepe"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Prueba"
+                },
+                "parent_id": {},
+                "timestamp": {
+                  "type": "string",
+                  "example": "2025-05-10T12:31:49.254Z"
+                },
+                "responses": {
+                  "type": "array",
+                  "example": [],
+                  "items": {}
+                },
+                "__v": {
+                  "type": "number",
+                  "example": 0
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "Comentario no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      }
+    },
+    "/api/comment/delete/{id}": {
+      "delete": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Eliminar comentario por ID",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID del comentario (ej: 681457a757562da3002c02d6)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Comentario eliminado exitosamente"
+          },
+          "404": {
+            "description": "Comentario no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      }
+    },
+    "/api/notifications/createNotification": {
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Crear una notificación",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Cuerpo de la solicitud",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "object"
+                },
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "sender": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "admin"
+                        }
+                      }
+                    },
+                    "user_id": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "integer"
+                        },
+                        "example": {
+                          "type": "number",
+                          "example": 101
+                        }
+                      }
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "john"
+                        }
+                      }
+                    },
+                    "notification": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "Tienes un nuevo mensaje en tu bandeja de entrada."
+                        }
+                      }
+                    },
+                    "relevance": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "enum": {
+                          "type": "array",
+                          "example": [
+                            "low",
+                            "medium",
+                            "high"
+                          ],
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "medium"
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": {
+                  "type": "array",
+                  "example": [
+                    "sender",
+                    "user_id",
+                    "user",
+                    "notification",
+                    "relevance"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Error en la solicitud"
+          }
+        }
+      }
+    },
+    "/api/notifications/:id/notification": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Obtener notificación por ID",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de la notificación (ej: 6814750fc209c9e3eb9bcd5b)",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalle de la notificación",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "example": "6814750fc209c9e3eb9bcd5b"
+                },
+                "sender": {
+                  "type": "string",
+                  "example": "admin"
+                },
+                "user_id": {
+                  "type": "number",
+                  "example": 101
+                },
+                "user": {
+                  "type": "string",
+                  "example": "john"
+                },
+                "notification": {
+                  "type": "string",
+                  "example": "Tienes un nuevo mensaje en tu bandeja de entrada."
+                },
+                "relevance": {
+                  "type": "string",
+                  "example": "medium"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "Notificación no encontrada"
+          }
+        }
+      }
+    },
+    "/api/notifications/getNotifications/:userId": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Obtener todas las notificaciones de un usuario",
+        "description": "",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID del usuario (ej: 101)",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de notificaciones del usuario",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "6814750fc209c9e3eb9bcd5b"
+                  },
+                  "sender": {
+                    "type": "string",
+                    "example": "admin"
+                  },
+                  "user_id": {
+                    "type": "number",
+                    "example": 101
+                  },
+                  "user": {
+                    "type": "string",
+                    "example": "john"
+                  },
+                  "notification": {
+                    "type": "string",
+                    "example": "Tienes un nuevo mensaje en tu bandeja de entrada."
+                  },
+                  "relevance": {
+                    "type": "string",
+                    "example": "medium"
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Error en la solicitud"
+          }
+        }
+      }
+    },
+    "/api/notifications/delete/:id": {
+      "delete": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Eliminar notificación por ID",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de la notificación (ej: 681471c0914598e2e39a7adb)",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Notificación eliminada"
+          },
+          "404": {
+            "description": "Notificación no encontrada"
+          }
+        }
+      }
+    },
+    "/api/notifications/notification/:id/read": {
+      "patch": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Marcar notificación como leída",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de la notificación (ej: 6814750fc209c9e3eb9bcd5b)",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Notificación marcada como leída"
+          },
+          "400": {
+            "description": "Formato de ID inválido"
+          },
+          "404": {
+            "description": "Notificación no encontrada"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    }
+  }
+}
