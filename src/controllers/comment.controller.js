@@ -1,5 +1,15 @@
 const commentService = require('../service/comment.service');
 
+async function createCommentResponse(req, res) {
+  const { commetnId, user, message } = req.body;
+  try {
+    const comentario = await commentService.addResponseToComment(commetnId, user, message);
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 async function createComment(req, res) {
   const { song_id, user, message } = req.body;
   try {

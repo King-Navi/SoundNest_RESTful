@@ -2,9 +2,19 @@ const express = require("express");
 const router = express.Router();
 const commentController = require('../controllers/comment.controller');
 const { validateNewComment } = require("../middlewares/validateNewComment.middleware");
+const { validateResponseSchema } = require("../middlewares/validateNewCommentResponse.middlware");
 
+/*
+TODO: 
+Create resonse
+*/
 //TODO: autorization
 
+
+
+
+router.post(
+    '/:commentId/respondComment', validateResponseSchema , commentController.addResponseToComment);
 
 router.post(
 /*

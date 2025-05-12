@@ -1,6 +1,7 @@
 require("dotenv").config();
 const https = require("https");
 const http = require("http");
+const multer = require('multer');
 const path = require("path");
 const express = require("express");
 const swaggerUi = require("swagger-ui-express");

@@ -1,4 +1,5 @@
-const { Comment, Response } = require('../modelsMongo/comment'); 
+const mongoose = require('mongoose');
+const { Comment } = require('../modelsMongo/comment');
 
 class CommentRepository {
   async createComment(songId, user, message) {
@@ -8,85 +9,89 @@ class CommentRepository {
       message,
     });
 
-    try {
-      await comentario.save();
-      return comentario;
-    } catch (error) {
-      console.error('Error al crear comentario:', error);
-      throw error;
-    }
+    await comentario.save();
+    return comentario;
   }
 
   async getCommentsBySong(songId) {
-    try {
-      const comentarios = await Comment.find({ song_id: songId })
-        .populate({
-          path: 'responses',
-          populate: {
-            path: 'responses',
-            model: 'Response',
-          },
-        })
-        .exec();
-      return comentarios;
-    } catch (error) {
-      console.error('Error al obtener comentarios por canción:', error);
-      throw error;
-    }
+    const comentarios = await Comment.aggregate([
+      {
+        $match: {
+          song_id: songId,
+          parent_id: null // solo comentarios raíz
+        }
+      },
+      {
+        $graphLookup: {
+          from: 'comments',          // colección objetivo
+          startWith: '$_id',         // desde cada comentario raíz
+          connectFromField: '_id',   // campo propio
+          connectToField: 'parent_id', // conecta con este campo de hijos
+          as: 'all_responses',       // el resultado se guarda aquí
+          depthField: 'depth'        // opcional: indica profundidad
+        }
+      },
+      {
+        $sort: { timestamp: -1 } //más recientes primero
+      }
+    ]);
+  
+    return comentarios;
   }
+  
 
   async getCommentById(commentId) {
-    try {
-      const comentario = await Comment.findById(commentId)
-        .populate({
-          path: 'responses',
-          populate: {
-            path: 'responses',
-            model: 'Response',
-          },
-        })
-        .exec();
-      return comentario;
-    } catch (error) {
-      console.error('Error al obtener comentario por ID:', error);
-      throw error;
-    }
+    const [comentario] = await Comment.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(commentId)
+        }
+      },
+      {
+        $graphLookup: {
+          from: 'comments',
+          startWith: '$_id',
+          connectFromField: '_id',
+          connectToField: 'parent_id',
+          as: 'all_responses',
+          depthField: 'depth'
+        }
+      }
+    ]);
+  
+    return comentario || null;
   }
 
-  async addResponseToComment(commentId, user, message) {
-    try {
-      const comentario = await Comment.findById(commentId);
-      const respuesta = new Response({
-        user,
-        message,
-        parent_id: commentId,
-      });
+  async addResponseToComment(parentCommentId, user, message) {
+    const parentComment = await Comment.findById(parentCommentId);
+  if (!parentComment) {
+    throw new Error('Comentario padre no encontrado');
+  }
 
-      await respuesta.save();
-      comentario.responses.push(respuesta);
-      await comentario.save();
+  const respuesta = new Comment({
+    song_id: parentComment.song_id,
+    user,
+    message,
+    parent_id: parentCommentId
+  });
 
-      return respuesta;
-    } catch (error) {
-      console.error('Error al agregar respuesta:', error);
-      throw error;
-    }
+  await respuesta.save();
+  return respuesta;
   }
 
   async deleteComment(commentId) {
-    try {
-      const comentario = await Comment.findByIdAndDelete(commentId);
-      if (comentario) {
-        await Response.deleteMany({ parent_id: commentId });
-      }
-      return comentario;
-    } catch (error) {
-      console.error('Error al eliminar comentario:', error);
-      throw error;
+    return await this._deleteRecursive(commentId);
+  }
+
+  async _deleteRecursive(commentId) {
+    const children = await Comment.find({ parent_id: commentId });
+    for (const child of children) {
+      await this._deleteRecursive(child._id);
     }
+    const deleted = await Comment.findByIdAndDelete(commentId);
+    return deleted;
   }
 }
 
-module.exports = {
-  CommentRepository
-};
+module.exports = CommentRepository
+

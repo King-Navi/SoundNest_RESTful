@@ -66,5 +66,27 @@ describe('Comment Service with real MongoDB', () => {
     const check = await commentService.getCommentById(created._id);
     expect(check).toBeNull();
   });
+
+  test('getCommentsBySong y getCommentById deben devolver la misma estructura', async () => {
+    const c1 = await commentService.createComment(77, 'user', 'Comentario raíz');
+    const r1 = await commentService.addResponseToComment(c1._id, 'user2', 'Respuesta 1');
+    const r1_1 = await commentService.addResponseToComment(r1._id, 'user3', 'Respuesta a R1');
+  
+    const porCancion = await commentService.getCommentsBySong(77);
+    const porId = await commentService.getCommentById(c1._id);
+  
+    expect(porCancion.length).toBe(1);
+    expect(porCancion[0]._id.toString()).toBe(porId._id.toString());
+    expect(porCancion[0].message).toBe(porId.message);
+    expect(porCancion[0].user).toBe(porId.user);
+    expect(porCancion[0].responses.length).toBe(porId.responses.length);
+    expect(porCancion[0].responses[0].message).toBe(porId.responses[0].message);
+    expect(porCancion[0].responses[0].responses[0].message).toBe(porId.responses[0].responses[0].message);
+    //FIXME:Erase Very sensitive 
+    expect(JSON.stringify(porCancion[0])).toBe(JSON.stringify(porId));
+
+  });
   
 });
+
+

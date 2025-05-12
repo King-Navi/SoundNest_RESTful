@@ -10,6 +10,13 @@ const USER_BASIC_ROUTE="/api/user";
 
 //TODO DOCUMENTACION
 router.get(
+  /*
+  
+  #
+  #swagger.responses[500] = { description: 'Server error' }
+  #swagger.responses[401] = { description: 'Unauthorized' }
+  #swagger.responses[403] = { description: 'Forbidden' }
+  */
   `${USER_BASIC_ROUTE}/validateJWT`,
   authorization,
   recoverUser

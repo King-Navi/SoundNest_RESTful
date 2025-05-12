@@ -1,6 +1,5 @@
-const { CommentRepository } = require('../repositories/ComentarioRepository.mongo.repository');
+const CommentRepository= require('../repositories/ComentarioRepository.mongo.repository');
 const commentRepository = new CommentRepository();
-const responseRepository = require('../repositories/ResponseRepository.mongo.repository');
 
 async function createComment(song_id, user, message) {
   try {
@@ -14,8 +13,9 @@ async function createComment(song_id, user, message) {
 
 async function getCommentsBySong(song_id) {
   try {
-    const comentarios = await commentRepository.getCommentsBySong(song_id);
-    return comentarios;
+    const rawComments = await commentRepository.getCommentsBySong(song_id);
+    return rawComments.map(buildResponseTree); //Array
+    return commentsTree;
   } catch (error) {
     console.error('Error al obtener los comentarios:', error);
     throw new Error('Error al obtener los comentarios');
@@ -24,8 +24,9 @@ async function getCommentsBySong(song_id) {
 
 async function getCommentById(commentId) {
   try {
-    const comentario = await commentRepository.getCommentById(commentId);
-    return comentario;
+    const rawComment = await commentRepository.getCommentById(commentId);
+    if (!rawComment) return null;
+    return buildResponseTree(rawComment); // JUST ONE
   } catch (error) {
     console.error('Error al obtener el comentario por ID:', error);
     throw new Error('Error al obtener el comentario');
@@ -51,6 +52,33 @@ async function deleteComment(commentId) {
     throw new Error('Error al eliminar el comentario');
   }
 }
+
+
+function buildResponseTree(comentarioRaiz) {
+  const all = comentarioRaiz.all_responses;
+  const responseMap = new Map();
+
+  for (const res of all) {
+    responseMap.set(res._id.toString(), { ...res, responses: [] });
+  }
+
+  const tree = [];
+
+  for (const res of all) {
+    const parentId = res.parent_id?.toString();
+    if (parentId === comentarioRaiz._id.toString()) {
+      tree.push(responseMap.get(res._id.toString()));
+    } else if (responseMap.has(parentId)) {
+      responseMap.get(parentId).responses.push(responseMap.get(res._id.toString()));
+    }
+  }
+
+  return {
+    ...comentarioRaiz,
+    responses: tree
+  };
+}
+
 
 module.exports = {
   createComment,

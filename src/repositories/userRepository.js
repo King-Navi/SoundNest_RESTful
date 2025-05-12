@@ -59,7 +59,7 @@ async function createUser(data) {
 
 async function updateUserById(userId, updateData) {
   const [rowsUpdated] = await AppUser.update(updateData, {
-    where: { id: userId },
+    where: { idUser: userId },
   });
 
   const user = await AppUser.findByPk(userId);
