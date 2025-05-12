@@ -1,6 +1,8 @@
 const userService = require("../service/user.service");
 const codeService = require("../service/codeEmail.service")
 const HttpError = require("../utils/exceptions/httpError");
+const { EmailAlreadySend } = require("../service/exceptions/exceptions");
+const NAME_FILE = "user.controller.js"
 
 async function registerUser(req, res) {
   try {
@@ -18,7 +20,7 @@ async function registerUser(req, res) {
       return res.status(err.statusCode).json({ error: err.message });
     }
 
-    console.error("Internal Server Error:", err);
+    console.error(`[${NAME_FILE}][registerUser] Internal Server Error:`, err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
@@ -32,7 +34,15 @@ async function sendCode(req, res) {
     await codeService.sendConfirmationCode(email);
     res.status(200).json({ message: "Code sent successfully" });
   } catch (err) {
-    console.error("Error sending code:", err);
+    if (err instanceof HttpError) {
+      return res.status(err.statusCode).json({ error: err.message });
+    }
+
+    if (err instanceof EmailAlreadySend) {
+      return res.status(400).json({ error: err.message });
+    }
+    console.error(`[${NAME_FILE}][sendCode] Error:, ${err}`);
+
     res.status(500).json({ error: "Failed to send code" });
   }
 }
@@ -64,7 +74,7 @@ async function compareCode(req, res) {
 
     res.status(200).json({ message: "Code verified successfully" });
   } catch (err) {
-    console.error("Error comparing code:", err);
+    console.error(`[${NAME_FILE}][compareCode] Error:, ${err}`);
     res.status(500).json({ error: "Failed to verify code" });
   }
 }
@@ -83,15 +93,35 @@ async function editUser(req, res) {
 
     res.json({ message: 'User updated successfully', user: updatedUser });
   } catch (err) {
-    console.error('[editUser] Error:', err);
+    if (err instanceof HttpError) {
+      return res.status(err.statusCode).json({ error: err.message });
+    }
+    console.error(`[${NAME_FILE}][editUser] Error:, ${err}`);
     res.status(500).json({ error: 'Failed to update user' });
   }
 }
+
+async function recoverUser(req, res) {
+  try {
+    const userId = req.user.id;
+    const recoveredUser = await userService.getUserById(userId)
+
+    res.status(200).json(recoveredUser);
+  } catch (err) {
+    if (err instanceof HttpError) {
+      return res.status(err.statusCode).json({ error: err.message });
+    }
+    console.error(`[${NAME_FILE}][recoverUser] Error:, ${err}`);
+    res.status(500).json({ error: 'Failed to validate user' });
+  }
+}
+
 
 
 module.exports = {
   registerUser,
   sendCode,
   compareCode,
-  editUser
+  editUser,
+  recoverUser
 };

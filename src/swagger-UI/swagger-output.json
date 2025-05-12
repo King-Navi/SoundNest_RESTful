@@ -121,6 +121,32 @@
         }
       }
     },
+    "/api/user/validateJWT": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/api/user/newUser": {
       "post": {
         "tags": [
@@ -668,6 +694,19 @@
                 "properties": {
                   "type": "object",
                   "properties": {
+                    "title": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "Title"
+                        }
+                      }
+                    },
                     "sender": {
                       "type": "object",
                       "properties": {
@@ -749,6 +788,7 @@
                 "required": {
                   "type": "array",
                   "example": [
+                    "title",
                     "sender",
                     "user_id",
                     "user",
@@ -782,6 +822,11 @@
         "description": "",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "id",
             "in": "path",
             "description": "ID de la notificación (ej: 6814750fc209c9e3eb9bcd5b)",
@@ -795,29 +840,45 @@
             "schema": {
               "type": "object",
               "properties": {
-                "id": {
+                "_id": {
                   "type": "string",
-                  "example": "6814750fc209c9e3eb9bcd5b"
+                  "example": "6821618d4f26dc92ccb426ff"
+                },
+                "title": {
+                  "type": "string",
+                  "example": "asdasd"
                 },
                 "sender": {
                   "type": "string",
-                  "example": "admin"
+                  "example": "fulanito23232"
                 },
                 "user_id": {
                   "type": "number",
-                  "example": 101
+                  "example": 1
                 },
                 "user": {
                   "type": "string",
-                  "example": "john"
+                  "example": "u"
                 },
                 "notification": {
                   "type": "string",
-                  "example": "Tienes un nuevo mensaje en tu bandeja de entrada."
+                  "example": "high"
                 },
                 "relevance": {
                   "type": "string",
-                  "example": "medium"
+                  "example": "high"
+                },
+                "read": {
+                  "type": "boolean",
+                  "example": false
+                },
+                "createdAt": {
+                  "type": "string",
+                  "example": "2025-05-12T02:48:45.459Z"
+                },
+                "__v": {
+                  "type": "number",
+                  "example": 0
                 }
               },
               "xml": {
@@ -825,8 +886,17 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Notificación no encontrada"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -839,6 +909,11 @@
         "summary": "Obtener todas las notificaciones de un usuario",
         "description": "",
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "userId",
             "in": "path",
@@ -855,29 +930,45 @@
               "items": {
                 "type": "object",
                 "properties": {
-                  "id": {
+                  "_id": {
                     "type": "string",
-                    "example": "6814750fc209c9e3eb9bcd5b"
+                    "example": "6821618d4f26dc92ccb426ff"
+                  },
+                  "title": {
+                    "type": "string",
+                    "example": "asdasd"
                   },
                   "sender": {
                     "type": "string",
-                    "example": "admin"
+                    "example": "fulanito23232"
                   },
                   "user_id": {
                     "type": "number",
-                    "example": 101
+                    "example": 1
                   },
                   "user": {
                     "type": "string",
-                    "example": "john"
+                    "example": "u"
                   },
                   "notification": {
                     "type": "string",
-                    "example": "Tienes un nuevo mensaje en tu bandeja de entrada."
+                    "example": "high"
                   },
                   "relevance": {
                     "type": "string",
-                    "example": "medium"
+                    "example": "high"
+                  },
+                  "read": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "example": "2025-05-12T02:48:45.459Z"
+                  },
+                  "__v": {
+                    "type": "number",
+                    "example": 0
                   }
                 }
               },
@@ -888,6 +979,15 @@
           },
           "400": {
             "description": "Error en la solicitud"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -901,6 +1001,11 @@
         "description": "",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "id",
             "in": "path",
             "description": "ID de la notificación (ej: 681471c0914598e2e39a7adb)",
@@ -912,8 +1017,17 @@
           "204": {
             "description": "Notificación eliminada"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Notificación no encontrada"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -926,6 +1040,11 @@
         "summary": "Marcar notificación como leída",
         "description": "",
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "id",
             "in": "path",
@@ -941,11 +1060,88 @@
           "400": {
             "description": "Formato de ID inválido"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Notificación no encontrada"
           },
           "500": {
             "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/songs/genres": {
+      "get": {
+        "tags": [
+          "Songs"
+        ],
+        "description": "Retrieves all available music genres.",
+        "responses": {
+          "200": {
+            "description": "List of music genres",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "idSongGenre": {
+                    "type": "number",
+                    "example": 4
+                  },
+                  "genreName": {
+                    "type": "string",
+                    "example": "Blues"
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/songs/extensions": {
+      "get": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Get all song file extensions",
+        "description": "Returns a list of available file extensions with their IDs.",
+        "responses": {
+          "200": {
+            "description": "Successful response - list of extensions",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "idSongExtension": {
+                    "type": "number",
+                    "example": 2
+                  },
+                  "extensionName": {
+                    "type": "string",
+                    "example": "wav"
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Server error while fetching extensions"
           }
         }
       }

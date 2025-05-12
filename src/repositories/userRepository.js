@@ -75,10 +75,28 @@ async function updateUserById(userId, updateData) {
   return updatedUser;
 }
 
+async function findUserById(id) {
+  try {
+    const user = await AppUser.findByPk(id);
+    if (!user) {
+      throw new Error("User not found.");
+    }
+    return user;
+  } catch (error) {
+    if (error instanceof Sequelize.ConnectionError) {
+      throw new Error("Cannot connect to the database.");
+    }
+    if (error instanceof Sequelize.DatabaseError) {
+      throw new Error("Database error occurred.");
+    }
+    throw error;
+  }
+}
 
 module.exports = {
   findUserByEmail,
   findUserByName,
   createUser,
-  updateUserById
+  updateUserById,
+  findUserById
 };

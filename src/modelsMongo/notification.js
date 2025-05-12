@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 const NOTIFICATION_RELEVANCE = require("./constants/notificationRelevance");
 
 const notificationSchema = new mongoose.Schema({
+  title:{
+    type: String,
+    require: true
+  },
   sender: {
     type: String,
     required: true,

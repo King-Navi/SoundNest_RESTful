@@ -10,7 +10,11 @@ describe('Comment Service with real MongoDB', () => {
   });
 
   afterAll(async () => {
-    await mongoose.connection.close();
+    try {
+      await mongoose.connection.close();
+    } catch (error) {
+      
+    }
   });
 
   beforeEach(async () => {

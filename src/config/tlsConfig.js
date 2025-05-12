@@ -5,8 +5,8 @@ function loadTLSCredentials() {
   const crtPath = process.env.TLS_CRT_PATH;
 
   if (!keyPath || !crtPath) {
-    console.warn('TLS certificates not provided. Falling back to HTTP.');
-    return null; // indicamos que no hay certificados
+    console.warn('[tslConfig.js] {loadTLSCredentials()} : TLS certificates not provided. Falling back to HTTP.');
+    return null;
   }
 
   try {
@@ -14,7 +14,7 @@ function loadTLSCredentials() {
     const cert = fs.readFileSync(crtPath, 'utf8');
     return { key, cert };
   } catch (err) {
-    console.warn('Error loading TLS certificates. Falling back to HTTP.', err);
+    console.warn('[tslConfig.js] {loadTLSCredentials()} : Error loading TLS certificates. Falling back to HTTP.');
     return null;
   }
 }

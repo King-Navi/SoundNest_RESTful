@@ -1,10 +1,11 @@
-const { generateToken, verifyJwtToken } = require('../service/jwtService');
+const { generateToken,verifyJwtToken } = require('../service/jwtService');
 
 describe('JWT Service', () => {
   const mockUser = {
-    id: '123',
-    username: 'testuser',
-    privateEmail: 'test@example.com',
+    idUser: '123',
+    nameUser: 'testuser',
+    email: 'test@example.com',
+    idRole: '1'
   };
 
   beforeAll(() => {
@@ -14,7 +15,7 @@ describe('JWT Service', () => {
   test('generateToken should return a valid JWT token', () => {
     const token = generateToken(mockUser);
     expect(typeof token).toBe('string');
-    expect(token.split('.')).toHaveLength(3); // JWTs have 3 parts
+    expect(token.split('.')).toHaveLength(3);
   });
 
   test('verifyJwtToken should return the payload for a valid token', () => {
@@ -22,9 +23,10 @@ describe('JWT Service', () => {
     const payload = verifyJwtToken(token);
 
     expect(payload).toMatchObject({
-      id: mockUser.id,
-      username: mockUser.username,
-      privateEmail: mockUser.privateEmail,
+      id: mockUser.idUser,
+      username: mockUser.nameUser,
+      email: mockUser.email,
+      role: mockUser.idRole,
     });
   });
 

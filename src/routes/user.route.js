@@ -1,9 +1,20 @@
 const express = require("express");
 const router = express.Router();
-const {registerUser, editUser} = require("../controllers/user.controller");
+const {registerUser, editUser, recoverUser} = require("../controllers/user.controller");
 const compareCodeMiddleware = require("../middlewares/compareCode.middleware");
 const authorization = require("../middlewares/auth.middleware");
 const { validateEditUser , validateNewUser} = require("../middlewares/validateEditUser.middleware");
+
+
+const USER_BASIC_ROUTE="/api/user";
+
+//TODO DOCUMENTACION
+router.get(
+  `${USER_BASIC_ROUTE}/validateJWT`,
+  authorization,
+  recoverUser
+);
+
 
 router.post(
   /* 
@@ -34,7 +45,7 @@ router.post(
   #swagger.responses[400] = { description: 'Invalid or missing data' }
   #swagger.responses[500] = { description: 'Server error' }
   */
-  "/newUser",
+  `${USER_BASIC_ROUTE}/newUser`,
   validateNewUser,
   compareCodeMiddleware,
   registerUser
@@ -67,7 +78,7 @@ router.patch(
   #swagger.responses[403] = { description: 'Invalid or expired token' }
   #swagger.responses[500] = { description: 'Server error' }
   */
-  "/editUser",
+  `${USER_BASIC_ROUTE}/editUser`,
   authorization,
   validateEditUser,
   editUser

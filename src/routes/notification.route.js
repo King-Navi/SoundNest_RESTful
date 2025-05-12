@@ -1,7 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const notificationController = require("../controllers/notification.controller");
-const { verifyJwtToken } = require("../service/jwtService");
+const authorization = require("../middlewares/auth.middleware");
+const {
+  canAccessNotificationsByIdUser,
+  canAccessNotificationsByIdNotification,
+  canDeleteByIdNotification,
+  canMarkReadNotification,
+} = require("../middlewares/canAccess.middleware");
 
 router.post(
   /*
@@ -15,13 +21,14 @@ router.post(
     schema: {
         type: 'object',
         properties: {
+            title: {type: 'string', example: 'Title'},
             sender: { type: 'string', example: 'admin' },
             user_id: { type: 'integer', example: 101 },
             user: { type: 'string', example: 'john' },
             notification: { type: 'string', example: 'Tienes un nuevo mensaje en tu bandeja de entrada.' },
             relevance: { type: 'string', enum: ['low', 'medium', 'high'], example: 'medium' }
         },
-        required: ['sender', 'user_id', 'user', 'notification', 'relevance']
+        required: ['title','sender', 'user_id', 'user', 'notification', 'relevance']
     }
 }
 #swagger.responses[204] = GOOD, no content
@@ -44,17 +51,23 @@ router.get(
 #swagger.responses[200] = {
     description: 'Detalle de la notificación',
     schema: {
-        id: "6814750fc209c9e3eb9bcd5b",
-        sender: "admin",
-        user_id: 101,
-        user: "john",
-        notification: "Tienes un nuevo mensaje en tu bandeja de entrada.",
-        relevance: "medium"
+        "_id": "6821618d4f26dc92ccb426ff",
+        "title": "asdasd",
+        "sender": "fulanito23232",
+        "user_id": 1,
+        "user": "u",
+        "notification": "high",
+        "relevance": "high",
+        "read": false,
+        "createdAt": "2025-05-12T02:48:45.459Z",
+        "__v": 0
     }
 }
 #swagger.responses[404] = { description: 'Notificación no encontrada' }
 */
   "/:id/notification",
+  authorization,
+  canAccessNotificationsByIdNotification,
   notificationController.getNotificationById
 );
 
@@ -71,17 +84,23 @@ router.get(
 #swagger.responses[200] = {
     description: 'Lista de notificaciones del usuario',
     schema: [{
-        id: "6814750fc209c9e3eb9bcd5b",
-        sender: "admin",
-        user_id: 101,
-        user: "john",
-        notification: "Tienes un nuevo mensaje en tu bandeja de entrada.",
-        relevance: "medium"
+        "_id": "6821618d4f26dc92ccb426ff",
+        "title": "asdasd",
+        "sender": "fulanito23232",
+        "user_id": 1,
+        "user": "u",
+        "notification": "high",
+        "relevance": "high",
+        "read": false,
+        "createdAt": "2025-05-12T02:48:45.459Z",
+        "__v": 0
     }]
 }
 #swagger.responses[400] = { description: 'Error en la solicitud' }
 */
   "/getNotifications/:userId",
+  authorization,
+  canAccessNotificationsByIdUser,
   notificationController.getAllNotificationsForUser
 );
 
@@ -99,6 +118,8 @@ router.delete(
 #swagger.responses[404] = { description: 'Notificación no encontrada' }
 */
   "/delete/:id",
+  authorization,
+  canDeleteByIdNotification,
   notificationController.deleteNotificationById
 );
 
@@ -117,6 +138,8 @@ router.patch(
 #swagger.responses[404] = { description: 'Notificación no encontrada' }
 */
   "/notification/:id/read",
+  authorization,
+  canMarkReadNotification,
   notificationController.markNotificationAsRead
 );
 

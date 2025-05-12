@@ -36,11 +36,8 @@ async function sendConfirmationCode(email ) {
     }
   } while (hasCode(code));
 
-  console.log(`Generated code ${code} for ${email}`);
-
-
   setCode(email, code);
-  setTimeout(() => deleteCode(email), 15 * 60 * 1000);
+  setTimeout(() => deleteCode(email), 5 * 60 * 1000);
   await transporter.sendMail({
     from: EMAIL_ACCOUNT,
     to: email,

@@ -11,9 +11,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(100),
       allowNull: false
     },
-    filePath: {
+    fileName: {
       type: DataTypes.STRING(255),
-      allowNull: false
+      allowNull: false,
+      unique: "fileName"
     },
     durationSeconds: {
       type: DataTypes.INTEGER,
@@ -29,6 +30,14 @@ module.exports = function(sequelize, DataTypes) {
       references: {
         model: 'SongGenre',
         key: 'idSongGenre'
+      }
+    },
+    idSongExtension: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'SongExtension',
+        key: 'idSongExtension'
       }
     },
     idAppUser: {
@@ -53,10 +62,25 @@ module.exports = function(sequelize, DataTypes) {
         ]
       },
       {
+        name: "fileName",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "fileName" },
+        ]
+      },
+      {
         name: "idSongGenre",
         using: "BTREE",
         fields: [
           { name: "idSongGenre" },
+        ]
+      },
+      {
+        name: "idSongExtension",
+        using: "BTREE",
+        fields: [
+          { name: "idSongExtension" },
         ]
       },
       {

@@ -92,7 +92,21 @@ async function updateUser(userId, updateData) {
   return updatedUser;
 }
 
+async function getUserById(userId) {
+  if (!userId) {
+    throw new ValidationError("User ID is required");
+  }
+  try {
+    const user = await userRepository.findUserById(userId);
+    return user;
+
+  } catch (error) {
+    throw error
+  }
+}
+
 module.exports = {
   registerUser,
   updateUser,
+  getUserById,
 };
