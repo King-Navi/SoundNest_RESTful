@@ -44,7 +44,6 @@ async function sendConfirmationCode(email ) {
     subject: "Your confirmation code",
     text: `Your confirmation code is: ${code}`,
   });
-
   return true;
 }
 
@@ -61,7 +60,6 @@ async function sendConfirmationCode(email ) {
 function verifyConfirmationCode(email, code) {
 
   const stored = getCode(email);
-  console.log("Stored code:", stored?.code, "Provided code:", code);
 
   if (!stored)
     return { valid: false, reason: ConfirmationReasons.EXPIRED_OR_NOT_FOUND };

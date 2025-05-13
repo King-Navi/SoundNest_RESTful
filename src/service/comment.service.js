@@ -1,23 +1,33 @@
+const { createTestScheduler } = require('jest');
 const CommentRepository= require('../repositories/ComentarioRepository.mongo.repository');
 const commentRepository = new CommentRepository();
 
-async function createComment(song_id, user, message) {
+const SongRepository= require('../repositories/song.repository');
+const { NonexistentSong } = require('./exceptions/exceptions');
+const songRepository = new SongRepository();
+
+
+async function createComment(song_id, user, message, idUser) {
   try {
-    const comentario = await commentRepository.createComment(song_id, user, message);
-    return comentario;
+    await existSong(song_id);
+    return await commentRepository.createComment(song_id, user, message, idUser);
   } catch (error) {
-    console.error('Error en la creación del comentario:', error);
-    throw new Error('Error en la creación del comentario');
+    throw error;
   }
+}
+
+async function existSong(song_id) {
+  if (await songRepository.songExists(song_id)) {
+    return true;
+  }
+  throw new NonexistentSong("The id song does not exist")
 }
 
 async function getCommentsBySong(song_id) {
   try {
     const rawComments = await commentRepository.getCommentsBySong(song_id);
-    return rawComments.map(buildResponseTree); //Array
-    return commentsTree;
+    return rawComments.map(buildResponseTree);
   } catch (error) {
-    console.error('Error al obtener los comentarios:', error);
     throw new Error('Error al obtener los comentarios');
   }
 }
@@ -26,17 +36,20 @@ async function getCommentById(commentId) {
   try {
     const rawComment = await commentRepository.getCommentById(commentId);
     if (!rawComment) return null;
-    return buildResponseTree(rawComment); // JUST ONE
+    return buildResponseTree(rawComment);
   } catch (error) {
     console.error('Error al obtener el comentario por ID:', error);
     throw new Error('Error al obtener el comentario');
   }
 }
+async function getRawCommentAuthorId(commentId) {
+  const comment = await commentRepository.getRawCommentById(commentId);
+  return comment ? comment.author_id?.toString() : null;
+}
 
 async function addResponseToComment(commentId, user, message) {
   try {
-    const respuesta = await commentRepository.addResponseToComment(commentId, user, message);
-    return respuesta;
+    return await commentRepository.addResponseToComment(commentId, user, message);
   } catch (error) {
     console.error('Error al agregar la respuesta al comentario:', error);
     throw new Error('Error al agregar la respuesta');
@@ -45,8 +58,7 @@ async function addResponseToComment(commentId, user, message) {
 
 async function deleteComment(commentId) {
   try {
-    const comentarioEliminado = await commentRepository.deleteComment(commentId);
-    return comentarioEliminado;
+    return await commentRepository.deleteComment(commentId);
   } catch (error) {
     console.error('Error al eliminar el comentario:', error);
     throw new Error('Error al eliminar el comentario');
@@ -72,9 +84,10 @@ function buildResponseTree(comentarioRaiz) {
       responseMap.get(parentId).responses.push(responseMap.get(res._id.toString()));
     }
   }
+  const { all_responses, ...limpio } = comentarioRaiz;
 
   return {
-    ...comentarioRaiz,
+    ...limpio,
     responses: tree
   };
 }
@@ -86,4 +99,5 @@ module.exports = {
   getCommentById,
   addResponseToComment,
   deleteComment,
+  getRawCommentAuthorId
 };

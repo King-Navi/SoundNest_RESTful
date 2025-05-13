@@ -1,14 +1,6 @@
 const Joi = require('joi');
 
 const newResponseSchema = Joi.object({
-      user: Joi.string()
-        .max(100)
-        .required()
-        .messages({
-          'any.required': 'El campo user es obligatorio',
-          'string.base': 'El campo user debe ser una cadena de texto',
-          'string.max': 'El campo user no puede tener más de 100 caracteres'
-        }),
       message: Joi.string()
         .max(500)
         .required()

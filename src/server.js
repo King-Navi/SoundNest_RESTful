@@ -26,7 +26,7 @@ const playlistImagePath = process.env.PLAYLIST_IMAGE_PATH_JS;
 
 app.use(express.json());
 app.use("/api/auth", authRoutes);
-app.use("/api/comment", commentRoutes);
+app.use(commentRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use(playlistRoutes);
 app.use(songRutes);

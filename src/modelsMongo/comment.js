@@ -8,6 +8,10 @@ const commentSchema = new Schema({
     type: Number,
     required : true
   },
+  author_id:{
+    type: Number,
+    required : true
+  },
   user: {
     type: String,
     required: true,

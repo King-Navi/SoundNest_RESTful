@@ -1,16 +1,28 @@
 const mongoose = require('mongoose');
 const { Comment } = require('../modelsMongo/comment');
+const { ValidationError } = require('sequelize');
 
 class CommentRepository {
-  async createComment(songId, user, message) {
-    const comentario = new Comment({
-      song_id: songId,
-      user,
-      message,
-    });
+  async createComment(songId, user, message, userId) {
+    try {
+      const comentario = new Comment({
+        song_id: songId,
+        author_id: userId,
+        user,
+        message,
+      });
 
-    await comentario.save();
-    return comentario;
+      await comentario.save();
+      return comentario;
+    } catch (error) {
+      if (error.name === 'ValidationError') {
+        for (let field in error.errors) {
+          throw ValidationError(`Error in field "${field}": ${error.errors[field].message}`);
+        }
+      } else {
+        throw error;
+      }
+    }
   }
 
   async getCommentsBySong(songId) {
@@ -60,6 +72,10 @@ class CommentRepository {
     ]);
   
     return comentario || null;
+  }
+
+  async getRawCommentById(commentId) {
+    return await Comment.findById(commentId).lean();
   }
 
   async addResponseToComment(parentCommentId, user, message) {

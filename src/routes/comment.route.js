@@ -3,22 +3,50 @@ const router = express.Router();
 const commentController = require('../controllers/comment.controller');
 const { validateNewComment } = require("../middlewares/validateNewComment.middleware");
 const { validateResponseSchema } = require("../middlewares/validateNewCommentResponse.middlware");
+const authorization = require("../middlewares/auth.middleware");
 
+const COMMENT_BASIC_ROUTE = "/api/comment"
+
+
+router.post(
 /*
-TODO: 
-Create resonse
+#swagger.path = '/api/comment/{commentId}/respondComment'
+#swagger.tags = ['Comments']
+#swagger.summary = 'Responder a un comentario existente'
+#swagger.parameters['commentId'] = {
+    in: 'path',
+    description: 'ID del comentario al que se desea responder',
+    required: true,
+    type: 'integer',
+    example: 5
+}
+#swagger.parameters['body'] = {
+    in: 'body',
+    description: 'Contenido de la respuesta al comentario',
+    required: true,
+    schema: {
+        type: 'object',
+        properties: {
+            message: { type: 'string', example: 'Estoy de acuerdo contigo' }
+        },
+        required: ['message']
+    }
+}
+#swagger.responses[204] = { description: 'Respuesta agregada exitosamente al comentario' }
+#swagger.responses[401] = { description: 'Unauthorized' }
+#swagger.responses[404] = { description: 'Comentario no encontrado' }
+#swagger.responses[500] = { description: 'Error del servidor' }
 */
-//TODO: autorization
+    `${COMMENT_BASIC_ROUTE}/:commentId/respondComment`,
+    authorization, 
+    validateResponseSchema , 
+    commentController.addResponseToComment
+);
 
-
-
-
-router.post(
-    '/:commentId/respondComment', validateResponseSchema , commentController.addResponseToComment);
 
 router.post(
 /*
-#swagger.path = '/api/comment/comment'
+#swagger.path = '/api/comment/createComment'
 #swagger.tags = ['Comments']
 #swagger.summary = 'Crear un comentario'
 #swagger.parameters['body'] = {
@@ -29,20 +57,25 @@ router.post(
         type: 'object',
         properties: {
             song_id: { type: 'integer', example: 123 },
-            user: { type: 'string', example: 'any' },
             message: { type: 'string', example: 'any' }
         },
-        required: ['song_id', 'user', 'message']
+        required: ['song_id', 'message']
     }
 }
 #swagger.responses[204] = { description: 'Comentario creado exitosamente' }
+#swagger.responses[401] = { description: 'Unauthorized' }
+#swagger.responses[404] = { description: 'Nonexistent song' }
 #swagger.responses[500] = { description: 'Error del servidor' }
 */
-    '/comment', validateNewComment , commentController.createComment);
+    `${COMMENT_BASIC_ROUTE}/createComment`,
+    authorization,
+    validateNewComment,
+    commentController.createComment
+);
 
 router.get(
 /*
-    #swagger.path = '/api/comment/getComment/{song_id}/comments'
+    #swagger.path = '/api/comment/getComment/:song_id/comments'
     #swagger.tags = ['Comments']
     #swagger.summary = 'Obtener comentarios por ID de canción'
     #swagger.parameters['song_id'] = {
@@ -71,7 +104,7 @@ router.get(
 
 router.get(
     /*
-    #swagger.path = '/api/comment/getComment/comment/{id}'
+    #swagger.path = '/api/comment/getComment/comment/:id'
     #swagger.tags = ['Comments']
     #swagger.summary = 'Obtener comentario por ID'
     #swagger.parameters['id'] = {
@@ -100,8 +133,6 @@ router.get(
     commentController.getCommentById
 );
 
-//router.post('/response/:commentId/responses', commentController.addResponseToComment);
-
 router.delete(
 /*
 #swagger.path = '/api/comment/delete/{id}'
@@ -114,9 +145,10 @@ router.delete(
     type: 'string'
 }
 #swagger.responses[204] = { description: 'Comentario eliminado exitosamente' }
-#swagger.responses[404] = { description: 'Comentario no encontrado' }
+#swagger.responses[404] = { description: 'Lack of permissions'}
 #swagger.responses[500] = { description: 'Error del servidor' }
 */
-    '/delete/:id', commentController.deleteComment);
+    `${COMMENT_BASIC_ROUTE}/delete/:id`,authorization, commentController.deleteComment
+);
 
 module.exports = router;

@@ -1,4 +1,4 @@
-const { generateToken,verifyJwtToken } = require('../service/jwtService');
+const { generateToken,verifyJwtToken } = require('../service/jwt.service');
 
 describe('JWT Service', () => {
   const mockUser = {

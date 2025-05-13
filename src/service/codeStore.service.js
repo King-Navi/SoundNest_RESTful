@@ -1,15 +1,18 @@
 const codeStore = new Map();
 
 function setCode(email, code) {
-  codeStore.set(email, { code: String(code) });
+  const cleanedEmail = email.trim().toLowerCase();
+  codeStore.set(cleanedEmail, { code: String(code) });
 }
 
 function getCode(email) {
-  return codeStore.get(email);
+  const cleanedEmail = email.trim().toLowerCase();
+  return codeStore.get(cleanedEmail);
 }
 
 function deleteCode(email) {
-  codeStore.delete(email);
+  const cleanedEmail = email.trim().toLowerCase();
+  codeStore.delete(cleanedEmail);
 }
 
 function hasCode(code) {

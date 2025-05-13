@@ -5,7 +5,16 @@ class EmailAlreadySend extends Error {
       this.statusCode = 400;
     }
   }
+
+class NonexistentSong extends Error {
+    constructor(message = 'The song does not exist') {
+      super(message);
+      this.name = 'Not exist';
+      this.statusCode = 404;
+    }
+  }
   
   module.exports = {
-    EmailAlreadySend
+    EmailAlreadySend,
+    NonexistentSong
   };

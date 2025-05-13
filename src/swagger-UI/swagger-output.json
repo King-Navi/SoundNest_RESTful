@@ -142,7 +142,7 @@
             "description": "Forbidden"
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Server error"
           }
         }
       }
@@ -413,7 +413,93 @@
         }
       }
     },
-    "/api/comment/comment": {
+    "/api/comment/{commentId}/respondComment": {
+      "post": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Responder a un comentario existente",
+        "description": "",
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID del comentario al que se desea responder",
+            "example": 5
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Contenido de la respuesta al comentario",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "object"
+                },
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "Estoy de acuerdo contigo"
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": {
+                  "type": "array",
+                  "example": [
+                    "message"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Respuesta agregada exitosamente al comentario"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Comentario no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      }
+    },
+    "/api/comment/createComment": {
       "post": {
         "tags": [
           "Comments"
@@ -421,6 +507,11 @@
         "summary": "Crear un comentario",
         "description": "",
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",
@@ -449,19 +540,6 @@
                         }
                       }
                     },
-                    "user": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "example": {
-                          "type": "string",
-                          "example": "any"
-                        }
-                      }
-                    },
                     "message": {
                       "type": "object",
                       "properties": {
@@ -481,7 +559,6 @@
                   "type": "array",
                   "example": [
                     "song_id",
-                    "user",
                     "message"
                   ],
                   "items": {
@@ -499,13 +576,22 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Nonexistent song"
+          },
           "500": {
             "description": "Error del servidor"
           }
         }
       }
     },
-    "/api/comment/getComment/{song_id}/comments": {
+    "/api/comment/getComment/:song_id/comments": {
       "get": {
         "tags": [
           "Comments"
@@ -516,9 +602,9 @@
           {
             "name": "song_id",
             "in": "path",
+            "description": "ID de la canción (ej: 1231231)",
             "required": true,
-            "type": "string",
-            "description": "ID de la canción (ej: 1231231)"
+            "type": "string"
           }
         ],
         "responses": {
@@ -575,7 +661,7 @@
         }
       }
     },
-    "/api/comment/getComment/comment/{id}": {
+    "/api/comment/getComment/comment/:id": {
       "get": {
         "tags": [
           "Comments"
@@ -586,9 +672,9 @@
           {
             "name": "id",
             "in": "path",
+            "description": "ID del comentario (ej: 681457a757562da3002c02d6)",
             "required": true,
-            "type": "string",
-            "description": "ID del comentario (ej: 681457a757562da3002c02d6)"
+            "type": "string"
           }
         ],
         "responses": {
@@ -656,14 +742,25 @@
             "required": true,
             "type": "string",
             "description": "ID del comentario (ej: 681457a757562da3002c02d6)"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
           "204": {
             "description": "Comentario eliminado exitosamente"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
-            "description": "Comentario no encontrado"
+            "description": "Lack of permissions"
           },
           "500": {
             "description": "Error del servidor"
