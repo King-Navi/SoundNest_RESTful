@@ -8,7 +8,8 @@
   "host": "localhost:6969",
   "basePath": "/",
   "schemes": [
-    "https"
+    "https",
+    "http"
   ],
   "paths": {
     "/api/auth/login": {
@@ -1168,6 +1169,501 @@
           },
           "500": {
             "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/songs/:amount/popular/:year/:month": {
+      "get": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Get most popular songs by month",
+        "description": "Retrieves detailed information about the top songs in a given month and year, ordered by total playCount.",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "path",
+            "description": "Number of songs to retrieve (max 60)",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "description": "Four-digit year (e.g. 2025)",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "description": "Month number (1-12)",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of most popular songs returned successfully.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "idSong": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "songName": {
+                    "type": "string",
+                    "example": "Canción de Prueba"
+                  },
+                  "fileName": {
+                    "type": "string",
+                    "example": "cancion_prueba.mp3"
+                  },
+                  "durationSeconds": {
+                    "type": "number",
+                    "example": 180
+                  },
+                  "releaseDate": {
+                    "type": "string",
+                    "example": "2025-05-14T00:15:46.000Z"
+                  },
+                  "isDeleted": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "idSongGenre": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "idSongExtension": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "userName": {
+                    "type": "string",
+                    "example": "juanito"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Example of descriptions"
+                  },
+                  "pathImageUrl": {
+                    "type": "string",
+                    "example": "protocol://host/route/file.extension"
+                  },
+                  "visualizations": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "idVisualizations": {
+                          "type": "number",
+                          "example": 2
+                        },
+                        "playCount": {
+                          "type": "number",
+                          "example": 15
+                        },
+                        "period": {
+                          "type": "string",
+                          "example": "2025-05-12"
+                        },
+                        "idSong": {
+                          "type": "number",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or missing parameter",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Invalid or missing 'amount'/'year'/'month' parameter"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "No popular songs found for the specified period",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Songs not found"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Failed to fetch popular songs: <message>"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/songs/:amount/recent": {
+      "get": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Get detailed information about recent songs (7 days ago max)",
+        "description": "Retrieves detailed information about songs of 7 days old max, including metadata, artist name, and visualization history.",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "path",
+            "description": "amount of the songs to retrieve",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Songs found and returned successfully.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "idSong": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "songName": {
+                    "type": "string",
+                    "example": "Canción de Prueba"
+                  },
+                  "fileName": {
+                    "type": "string",
+                    "example": "cancion_prueba.mp3"
+                  },
+                  "durationSeconds": {
+                    "type": "number",
+                    "example": 180
+                  },
+                  "releaseDate": {
+                    "type": "string",
+                    "example": "2025-05-14T00:15:46.000Z"
+                  },
+                  "isDeleted": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "idSongGenre": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "idSongExtension": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "userName": {
+                    "type": "string",
+                    "example": "juanito"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Example of descriptions"
+                  },
+                  "pathImageUrl": {
+                    "type": "string",
+                    "example": "protocol://host/rute/file.extension"
+                  },
+                  "visualizations": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "idVisualizations": {
+                          "type": "number",
+                          "example": 2
+                        },
+                        "playCount": {
+                          "type": "number",
+                          "example": 15
+                        },
+                        "period": {
+                          "type": "string",
+                          "example": "2025-05-12"
+                        },
+                        "idSong": {
+                          "type": "number",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "error": "Invalid or missing amount"
+          },
+          "404": {
+            "error": "Songs not found",
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/songs/:amount/random": {
+      "get": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Get detailed information about random songs",
+        "description": "Retrieves detailed information for random songs, including metadata, artist name, and visualization history.",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "path",
+            "description": "amount of the songs to retrieve",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Songs found and returned successfully.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "idSong": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "songName": {
+                    "type": "string",
+                    "example": "Canción de Prueba"
+                  },
+                  "fileName": {
+                    "type": "string",
+                    "example": "cancion_prueba.mp3"
+                  },
+                  "durationSeconds": {
+                    "type": "number",
+                    "example": 180
+                  },
+                  "releaseDate": {
+                    "type": "string",
+                    "example": "2025-05-14T00:15:46.000Z"
+                  },
+                  "isDeleted": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "idSongGenre": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "idSongExtension": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "userName": {
+                    "type": "string",
+                    "example": "juanito"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Example of descriptions"
+                  },
+                  "pathImageUrl": {
+                    "type": "string",
+                    "example": "protocol://host/rute/file.extension"
+                  },
+                  "visualizations": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "idVisualizations": {
+                          "type": "number",
+                          "example": 2
+                        },
+                        "playCount": {
+                          "type": "number",
+                          "example": 15
+                        },
+                        "period": {
+                          "type": "string",
+                          "example": "2025-05-12"
+                        },
+                        "idSong": {
+                          "type": "number",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "error": "Invalid or missing amount"
+          },
+          "404": {
+            "description": "Not Found",
+            "error": "Songs not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/songs/:idsong/song": {
+      "get": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Get detailed information about a song",
+        "description": "Retrieves detailed information for a specific song, including metadata, artist name, and visualization history.",
+        "parameters": [
+          {
+            "name": "idsong",
+            "in": "path",
+            "description": "ID of the song to retrieve",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Song found and returned successfully.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "idSong": {
+                  "type": "number",
+                  "example": 1
+                },
+                "songName": {
+                  "type": "string",
+                  "example": "Canción de Prueba"
+                },
+                "fileName": {
+                  "type": "string",
+                  "example": "cancion_prueba.mp3"
+                },
+                "durationSeconds": {
+                  "type": "number",
+                  "example": 180
+                },
+                "releaseDate": {
+                  "type": "string",
+                  "example": "2025-05-14T00:15:46.000Z"
+                },
+                "isDeleted": {
+                  "type": "boolean",
+                  "example": false
+                },
+                "idSongGenre": {
+                  "type": "number",
+                  "example": 1
+                },
+                "idSongExtension": {
+                  "type": "number",
+                  "example": 1
+                },
+                "userName": {
+                  "type": "string",
+                  "example": "juanito"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "Example of descriptions"
+                },
+                "pathImageUrl": {
+                  "type": "string",
+                  "example": "protocol://host/rute/file.extension"
+                },
+                "visualizations": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "idVisualizations": {
+                        "type": "number",
+                        "example": 2
+                      },
+                      "playCount": {
+                        "type": "number",
+                        "example": 15
+                      },
+                      "period": {
+                        "type": "string",
+                        "example": "2025-05-12"
+                      },
+                      "idSong": {
+                        "type": "number",
+                        "example": 1
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Song not found"
+          },
+          "500": {
+            "description": "Internal server error"
           }
         }
       }

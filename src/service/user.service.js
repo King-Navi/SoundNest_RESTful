@@ -1,5 +1,5 @@
 const AdditionalInfo = require("../modelsMongo/AdditionalInfo");
-const userRepository = require("../repositories/userRepository");
+const userRepository = require("../repositories/user.repository");
 const validator = require("validator");
 const {
   EmailAlreadyExist,

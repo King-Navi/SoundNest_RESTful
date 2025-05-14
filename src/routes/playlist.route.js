@@ -19,7 +19,7 @@ router.post(
     
     MAXIMO 20 MB
     SOLO PNG Y JGP
-    TIENE QUE TENER playlistname, y el file
+    TIENE QUE TENER playlistname, y el file en form-data
     JWT NECESARIO 
     OPCIONAL description
     */

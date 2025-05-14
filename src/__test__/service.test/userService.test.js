@@ -1,7 +1,7 @@
-jest.mock('../models/init-models');
-jest.mock('../config/sequelize', () => 'fake-sequelize');
+jest.mock('../../models/init-models');
+jest.mock('../../config/sequelize', () => 'fake-sequelize');
 
-const initModels = require('../models/init-models');
+const initModels = require('../../models/init-models');
 const { Sequelize } = require('sequelize');
 const { ConnectionError, DatabaseError, UniqueConstraintError } = Sequelize;
 
@@ -9,7 +9,7 @@ const mockFindOne = jest.fn();
 const mockCreate = jest.fn();
 initModels.mockReturnValue({ AppUser: { findOne: mockFindOne, create: mockCreate } });
 
-const { findUserByEmail, findUserByName, createUser } = require('../repositories/userRepository');
+const { findUserByEmail, findUserByName, createUser } = require('../../repositories/user.repository');
 
 describe('findUserByEmail', () => {
   const emailInput = 'Test@Example.com';

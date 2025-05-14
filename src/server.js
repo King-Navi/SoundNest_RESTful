@@ -32,7 +32,7 @@ app.use(playlistRoutes);
 app.use(songRutes);
 app.use(userRutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
-//TODO: MORE SECURITY:
+//TODO: MORE SECURITY or no?:
 app.use("/images/playlists", express.static(path.resolve(playlistImagePath)));
 app.use((err, req, res, next) => {
   if (

@@ -1,5 +1,113 @@
-const { getGenres, getExtensions } = require("../service/song.service");
+const { NotFoundError } = require("../repositories/exceptions/song.exceptions");
+const {
+  getGenres,
+  getExtensions,
+  getSong,
+  getRandom,
+  getRecent,
+  getMostPopular,
+  searchSong,
+} = require("../service/song.service");
+async function allUserSongController(req, res) {
+  try {
+    res.status(500).send();
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch : " + error.message });
+  }
+}
 
+async function searchSongController(req, res) {
+  try {
+    const { songName, artistName, idGenre, limit, offset } = req.query;
+    const result = await searchSong(songName, artistName, idGenre, limit, offset);
+    res.status(200).json(result);
+
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch : " + error.message });
+  }
+}
+async function getMostPopularSongsController(req, res) {
+  try {
+    const { year, month, amount } = req.params;
+    const yearNum = Number(year);
+    const monthNum = Number(month);
+    const amountNum = Number(amount);
+    if (isNaN(amountNum) || amountNum <= 0) {
+      return res
+        .status(400)
+        .json({ error: "Invalid or missing amountNumericAmount" });
+    }
+    if (isNaN(yearNum) || yearNum < 1) {
+      return res
+        .status(400)
+        .json({ error: "Invalid or missing yearNumericAmount" });
+    }
+    if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
+      return res
+        .status(400)
+        .json({ error: "Invalid or missing monthNumericAmount" });
+    }
+    const result = await getMostPopular(yearNum, monthNum, amountNum);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch : " + error.message });
+  }
+}
+
+async function getSongRecentController(req, res) {
+  try {
+    const { amount } = req.params;
+    const numericAmount = Number(amount);
+    if (!amount || isNaN(numericAmount)) {
+      return res.status(400).json({ error: "Invalid or missing amount" });
+    }
+    const result = await getRecent(amount);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch : " + error.message });
+  }
+}
+async function getSongRandomController(req, res) {
+  try {
+    const { amount } = req.params;
+
+    const numericAmount = Number(amount);
+    if (!amount || isNaN(numericAmount) || numericAmount <= 0) {
+      return res.status(400).json({ error: "Invalid or missing amount" });
+    }
+
+    const result = await getRandom(amount);
+
+    res.status(200).json(result);
+  } catch (error) {
+    if (error instanceof NotFoundError) {
+      return res.status(404).json({ error: "Songs not found" });
+    }
+    res.status(500).json({ error: "Failed to fetch : " + error.message });
+  }
+}
+
+async function getSongController(req, res) {
+  try {
+    const { idsong } = req.params;
+
+    const songId = Number(idsong);
+    if (!idsong || isNaN(songId) || songId <= 0) {
+      return res.status(400).json({ error: "Invalid or missing song ID" });
+    }
+    const result = await getSong(Number(idsong));
+    if (!result) {
+      return res.status(404).json({ error: "Song not found" });
+    }
+
+    res.status(200).json(result);
+  } catch (error) {
+    if (error instanceof NotFoundError) {
+      return res.status(404).json({ error: "Song not found" });
+    }
+    res.status(500).json({ error: "Failed to fetch : " + error.message });
+  }
+}
 /**
  * Express handler to return all song genres as JSON.
  *
@@ -29,4 +137,13 @@ async function getExtensionsController(req, res) {
   }
 }
 
-module.exports = { getGenresController,getExtensionsController  };
+module.exports = {
+  getSongController,
+  getGenresController,
+  getExtensionsController,
+  getSongRandomController,
+  getSongRecentController,
+  getMostPopularSongsController,
+  searchSongController,
+  allUserSongController,
+};

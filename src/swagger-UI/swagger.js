@@ -20,7 +20,7 @@ const doc = {
     description: 'Documentación de mi API RESTful',
   },
   host: 'localhost:6969',
-  schemes: ['https'],
+  schemes: ['https', 'http'],
 };
 
 const outputFile = './swagger-output.json';

@@ -24,6 +24,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.DATE,
       allowNull: false
     },
+    isDeleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
+    },
     idSongGenre: {
       type: DataTypes.INTEGER,
       allowNull: false,

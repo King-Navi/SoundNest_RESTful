@@ -2,9 +2,10 @@ const { createTestScheduler } = require('jest');
 const CommentRepository= require('../repositories/ComentarioRepository.mongo.repository');
 const commentRepository = new CommentRepository();
 
-const SongRepository= require('../repositories/song.repository');
 const { NonexistentSong } = require('./exceptions/exceptions');
-const songRepository = new SongRepository();
+const {
+  verifySongExists
+} = require('../repositories/song.repository');
 
 
 async function createComment(song_id, user, message, idUser) {
@@ -17,7 +18,7 @@ async function createComment(song_id, user, message, idUser) {
 }
 
 async function existSong(song_id) {
-  if (await songRepository.songExists(song_id)) {
+  if (await verifySongExists(song_id)) {
     return true;
   }
   throw new NonexistentSong("The id song does not exist")

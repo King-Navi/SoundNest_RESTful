@@ -3,7 +3,6 @@ const initModels = require("../models/init-models");
 const { AppUser } = initModels(sequelize);
 const { Sequelize, Op } = require("sequelize");
 const NoChangesError = require("./exceptions/noChangesError");
-
 async function findUserByEmail(email) {
   try {
     return await AppUser.findOne({

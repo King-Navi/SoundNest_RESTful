@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const userRepository = require("../repositories/userRepository");
+const userRepository = require("../repositories/user.repository");
 const { comparePasswords } = require("../utils/hash.util");
 const { ValidationError } = require("../utils/exceptions/validation.exception");
 const {generateToken } = require("../service/jwt.service")

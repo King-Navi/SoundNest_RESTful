@@ -8,7 +8,7 @@
     "test": "jest",
     "prepare": "husky",
     "nodemon:dev": "nodemon",
-    "sequelize:createModels": "node src/config/generate-models.js",
+    "mysql:build": "node src/config/generate-models.js",
     "swagger:docs": "node src/swagger-UI/swagger.js",
     "docker:build": "docker buildx build --platform linux/amd64,linux/arm64 -t navidocky/soundnest-restful:latest --push ."
   },
