@@ -1,10 +1,55 @@
 const express = require("express");
 const router = express.Router();
+const authorization = require("../middlewares/auth.middleware");
 const { loginUser } = require("../controllers/login.controller");
 const {
   sendCode,
   compareCode,
 }= require("../controllers/user.controller");
+const {recoverUser} = require("../controllers/user.controller");
+
+const AUTH_BASIC_ROUTE = "/api/auth";
+
+router.get(
+  /*
+  #swagger.path = '/api/auth/validateJWT'
+  #swagger.tags = ['Auth']
+  #swagger.description = 'Validates a JWT and returns user information if the token is valid.'
+  
+  #swagger.responses[200] = {
+    description: 'User data extracted from valid JWT.',
+    schema: {
+      idUser: 2,
+      nameUser: '1',
+      email: 'zs22013698@estudiantes.uv.mx',
+      idRole: 1
+    }
+  }
+
+  #swagger.responses[401] = {
+    description: 'Unauthorized - Missing or invalid token',
+    schema: {
+      "message": "No token provided"
+    }
+  }
+  #swagger.responses[403] = {
+    description: 'Forbidden - Access to the resource is prohibited',
+    schema: {
+      "message": "Invalid or expired token"
+    }
+  }
+
+  #swagger.responses[500] = {
+    description: 'Internal Server Error',
+    schema: {
+      message: 'Unexpected error while validating token'
+    }
+  }
+    */
+  `${AUTH_BASIC_ROUTE}/validateJWT`,
+  authorization,
+  recoverUser
+);
 
 router.post(
   /* 
@@ -20,7 +65,7 @@ router.post(
     }
   }
 */
-  "/login",
+  `${AUTH_BASIC_ROUTE}/login`,
   loginUser
 );
 
@@ -43,7 +88,7 @@ router.post(
     description: 'Failed to send code'
   }
 */
-  "/sendCodeEmail",
+  `${AUTH_BASIC_ROUTE}/sendCodeEmail`,
   sendCode
 );
 
@@ -67,7 +112,7 @@ router.post(
     description: 'Invalid or expired code'
   }
 */
-  "/verifiCode",
+  `${AUTH_BASIC_ROUTE}/validateJWT`,
   compareCode
 );
 

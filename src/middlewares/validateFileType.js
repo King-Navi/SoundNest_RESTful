@@ -1,5 +1,5 @@
-const fileType = require('file-type');
-const fs = require('fs');
+const fileType = require("file-type");
+const fs = require("fs");
 
 /**
  * Middleware to validate the actual MIME type of the uploaded file using the `file-type` library.
@@ -8,26 +8,29 @@ const fs = require('fs');
  * - If the file type is invalid, the file is deleted from disk and a 400 Bad Request is returned.
  * - If validation passes, the request proceeds to the next middleware.
  */
-const validateFileType = () => {
-  return async (req, res, next) => {
-    if (!req.file || !req.file.path) {
-      return res.status(400).json({ error: 'File not provided' });
+async function validateFileType(req, res, next) {
+  if (!req.file || !req.file.path) {
+    return res.status(400).json({ error: "File not provided" });
+  }
+
+  try {
+    const type = await fileType.fileTypeFromFile(req.file.path);
+
+    if (!type || !["image/jpeg", "image/png"].includes(type.mime)) {
+      await fs.promises.unlink(req._tmpDirPath, {
+        recursive: true,
+        force: true,
+      });
+      return res
+        .status(400)
+        .json({ error: "Invalid file type. Only PNG and JPG are allowed." });
     }
 
-    try {
-      const type = await fileType.fileTypeFromFile(req.file.path);
-
-      if (!type || !['image/jpeg', 'image/png'].includes(type.mime)) {
-        await fs.promises.unlink(req.file.path);
-        return res.status(400).json({ error: 'Invalid file type. Only PNG and JPG are allowed.' });
-      }
-
-      next();
-    } catch (err) {
-      console.error('[validateFileType] Error checking file type:', err.message);
-      return res.status(500).json({ error: 'Internal file validation error' });
-    }
-  };
-};
+    next();
+  } catch (err) {
+    console.error("[validateFileType] Error checking file type:", err.message);
+    return res.status(500).json({ error: "Internal file validation error" });
+  }
+}
 
 module.exports = validateFileType;

@@ -2,10 +2,10 @@ const { generateToken,verifyJwtToken } = require('../../service/jwt.service');
 
 describe('JWT Service', () => {
   const mockUser = {
-    idUser: '123',
+    idUser: 123,
     nameUser: 'testuser',
     email: 'test@example.com',
-    idRole: '1'
+    idRole: 1
   };
 
   beforeAll(() => {

@@ -10,10 +10,10 @@ const verifyJwtToken = (token) => {
 const generateToken = (user) => {
   return jwt.sign(
     {
-      id: user.idUser,
+      id: Number(user.idUser),
       username: user.nameUser,
       email: user.email,
-      role: user.idRole,
+      role: Number(user.idRole),
     },
     process.env.JWT_SECRET,
     { expiresIn: "23h" }

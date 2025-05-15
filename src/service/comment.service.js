@@ -1,4 +1,3 @@
-const { createTestScheduler } = require('jest');
 const CommentRepository= require('../repositories/ComentarioRepository.mongo.repository');
 const commentRepository = new CommentRepository();
 
@@ -66,7 +65,14 @@ async function deleteComment(commentId) {
   }
 }
 
-
+/**
+ * Construye un árbol de respuestas a partir de un comentario raíz y su lista de respuestas planas.
+ *
+ * @param {Object} comentarioRaiz - El comentario raíz que contiene la propiedad `all_responses`,
+ *                                   una lista plana de todas las respuestas relacionadas.
+ * @returns {Object} Una estructura que representa el comentario raíz con las respuestas
+ *                   anidadas jerárquicamente bajo la propiedad `responses`.
+ */
 function buildResponseTree(comentarioRaiz) {
   const all = comentarioRaiz.all_responses;
   const responseMap = new Map();

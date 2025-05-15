@@ -5,12 +5,6 @@ const tmp = require('tmp');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 
-const uploadDir = process.env.PLAYLIST_IMAGE_PATH_JS;
-
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
 const fileFilter = (req, file, cb) => {
   const allowedMimeTypes = ['image/jpeg', 'image/png'];
 
@@ -20,10 +14,6 @@ const fileFilter = (req, file, cb) => {
     cb(new Error('Only .png and .jpg images are allowed'));
   }
 };
-
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -42,8 +32,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 20 * 1024 * 1024 } // 20MB MAX
+  limits: { fileSize: 20 * 1024 * 1024 } // 20MB máximo
 });
-
 
 module.exports = upload;

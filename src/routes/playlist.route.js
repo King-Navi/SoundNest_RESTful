@@ -10,6 +10,7 @@ PUT Create New PlayList
 
 PATCH ADD SONG TO PLAYLIST
 
+PATH editar nombre
 DELETE new Playlist
 */
 const PLAYLIST_BASIC_ROUTE = "/api/playlist"
@@ -26,7 +27,7 @@ router.post(
     `${PLAYLIST_BASIC_ROUTE}/upload`,
     authorization, 
     upload.single('image'),
-    validateFileType(),                 
+    validateFileType,                 
     validateNewPlaylist(),
     uploadPlaylistImageController
 );

@@ -239,6 +239,53 @@ async function getSongById(id) {
   return song;
 }
 
+/**
+ * Retrieves all non-deleted songs for a specific user.
+ *
+ * @param {number} userId - ID of the AppUser
+ * @returns {Promise<Array>} List of Song instances
+ */
+async function getSongsByUserId(userId) {
+  if (!userId || isNaN(userId)) {
+    throw new Error("Invalid user ID");
+  }
+
+  const songs = await Song.findAll({
+    where: {
+      idAppUser: userId,
+      isDeleted: false
+    },
+    order: [["releaseDate", "DESC"]]
+  });
+
+  return songs;
+}
+
+/**
+ * Retrieves the most recently released (non-deleted) song by a specific user.
+ *
+ * @param {number} userId - ID of the AppUser
+ * @returns {Promise<Object|null>} The most recent Song instance or null if not found
+ */
+async function getMostRecentSongByUser(userId) {
+  if (!userId || isNaN(userId)) {
+    throw new Error("Invalid user ID");
+  }
+
+  const song = await Song.findOne({
+    where: {
+      idAppUser: userId,
+      isDeleted: false
+    },
+    order: [["releaseDate", "DESC"]]
+  });
+
+  return song;
+}
+async function updateSongSetDeleted(idSong) {
+  return await Song.update({ isDeleted: true }, { where: { idSong } });
+}
+
 module.exports = {
   MAX_SONGS_RECOVER,
   getSongsByFilters,
@@ -249,4 +296,7 @@ module.exports = {
   getMostViewedSongsThisMonth,
   getSongsByIds,
   getSongById,
+  getSongsByUserId,
+  getMostRecentSongByUser,
+  updateSongSetDeleted
 };

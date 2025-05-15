@@ -3,6 +3,7 @@ const initModels = require("../models/init-models");
 const { AppUser } = initModels(sequelize);
 const { Sequelize, Op } = require("sequelize");
 const NoChangesError = require("./exceptions/noChangesError");
+const ID_ROLE_ADMIN = 2;
 async function findUserByEmail(email) {
   try {
     return await AppUser.findOne({
@@ -63,14 +64,14 @@ async function updateUserById(userId, updateData) {
 
   const user = await AppUser.findByPk(userId);
   if (!user) {
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
 
   if (rowsUpdated === 0) {
     throw new NoChangesError();
   }
   const updatedUser = await AppUser.findByPk(userId);
-  
+
   return updatedUser;
 }
 
@@ -93,9 +94,10 @@ async function findUserById(id) {
 }
 
 module.exports = {
+  ID_ROLE_ADMIN,
   findUserByEmail,
   findUserByName,
   createUser,
   updateUserById,
-  findUserById
+  findUserById,
 };

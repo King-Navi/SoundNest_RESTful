@@ -55,7 +55,6 @@ async function getVisualizationsBySongId(idSong) {
     order: [["period", "ASC"]],
   });
 }
-
 module.exports = {
   getVisualizationsBySongId,
   getTopSongIdsByMonth,

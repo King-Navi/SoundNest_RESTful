@@ -1,3 +1,4 @@
+const fs = require("fs/promises");
 const { NotFoundError } = require("../repositories/exceptions/song.exceptions");
 const {
   getGenres,
@@ -7,10 +8,45 @@ const {
   getRecent,
   getMostPopular,
   searchSong,
+  getSongOfUser,
+  getLastUserSong,
+  deleteSongService,
 } = require("../service/song.service");
-async function allUserSongController(req, res) {
+const { updateSongImage } = require("../service/songImage.service");
+
+async function deleteSongController(req, res) {
   try {
-    res.status(500).send();
+    const idSong = Number(req.params.idsong);
+    const result = await deleteSongService(idSong);
+    return res.status(200).json(result);
+  } catch (err) {
+    console.error('[deleteSongController]', err);
+    if (err.message.includes('does not exist')) {
+      return res.status(404).json({ error: err.message });
+    }
+    return res.status(500).json({ error: err.message });
+  }
+}
+
+
+async function updateImageSongController(req, res) {
+  try {
+    const songId = Number(req.params.idsong);
+    const fileName = req._uploadedFileName;
+    const tmpDir = req._tmpDirPath;
+
+    try {
+      await updateSongImage(songId, fileName, tmpDir);
+      return res.status(204).end();
+    } catch (error) {
+      console.error("[updateImageSongController]", error);
+      if (tmpDir) {
+        await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
+      }
+      return res
+        .status(500)
+        .json({ error: "Error al actualizar imagen: " + error.message });
+    }
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch : " + error.message });
   }
@@ -19,9 +55,14 @@ async function allUserSongController(req, res) {
 async function searchSongController(req, res) {
   try {
     const { songName, artistName, idGenre, limit, offset } = req.query;
-    const result = await searchSong(songName, artistName, idGenre, limit, offset);
+    const result = await searchSong(
+      songName,
+      artistName,
+      idGenre,
+      limit,
+      offset
+    );
     res.status(200).json(result);
-
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch : " + error.message });
   }
@@ -136,6 +177,25 @@ async function getExtensionsController(req, res) {
     res.status(500).json({ error: "Failed to fetch extensions." });
   }
 }
+async function getSongOfUserController(req, res) {
+  try {
+    const { idAppUser } = req.params;
+    const extensions = await getSongOfUser(idAppUser);
+    res.status(200).json(extensions);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch songs." + error.message });
+  }
+}
+
+async function getLastUserSongController(req, res) {
+  try {
+    const { idAppUser } = req.params;
+    const extensions = await getLastUserSong(idAppUser);
+    res.status(200).json(extensions);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch songs." + error.message });
+  }
+}
 
 module.exports = {
   getSongController,
@@ -145,5 +205,8 @@ module.exports = {
   getSongRecentController,
   getMostPopularSongsController,
   searchSongController,
-  allUserSongController,
+  getSongOfUserController,
+  getLastUserSongController,
+  updateImageSongController,
+  deleteSongController
 };

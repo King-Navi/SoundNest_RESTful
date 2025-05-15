@@ -4,7 +4,7 @@ const sequelize = require('./sequelize');
 const {connectMongo} = require('./databaseMongo');
 
 const RETRY_LIMIT = 10;
-const RETRY_INTERVAL_MS = 3000;
+const RETRY_INTERVAL_MS = 5000;
 
 async function initializeDatabase() {
   let retries = 0;

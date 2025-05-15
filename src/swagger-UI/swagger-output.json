@@ -12,6 +12,95 @@
     "http"
   ],
   "paths": {
+    "/api/auth/validateJWT": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Validates a JWT and returns user information if the token is valid.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User data extracted from valid JWT.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "idUser": {
+                  "type": "number",
+                  "example": 2
+                },
+                "nameUser": {
+                  "type": "string",
+                  "example": "1"
+                },
+                "email": {
+                  "type": "string",
+                  "example": "zs22013698@estudiantes.uv.mx"
+                },
+                "idRole": {
+                  "type": "number",
+                  "example": 1
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "No token provided"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Access to the resource is prohibited",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Invalid or expired token"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Unexpected error while validating token"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/login": {
       "post": {
         "tags": [
@@ -118,32 +207,6 @@
           },
           "500": {
             "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/api/user/validateJWT": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "500": {
-            "description": "Server error"
           }
         }
       }
@@ -1169,6 +1232,563 @@
           },
           "500": {
             "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/songs/:idsong/delete": {
+      "delete": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Delete a song",
+        "description": "Deletes a song by its ID. Removes associated image and audio, then marks the record as deleted. Only the owner or an admin may perform this action.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "idsong",
+            "description": "ID of the song whose image will be deleted",
+            "required": true,
+            "type": "integer",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/songs/:idsong/image": {
+      "patch": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Upload or update an image for a song",
+        "description": "Allows a user to upload or replace the image associated with a song. Only the owner of the song or an admin can perform this action.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "idsong",
+            "in": "path",
+            "description": "ID of the song whose image will be updated",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "imagefile",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "Image file to be uploaded. Must be PNG or JPEG.",
+            "imagesTypes": [
+              "image/png",
+              "image/jpeg"
+            ]
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Invalid file or missing required data",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "File not provided"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "User is not authorized to update this song image",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Acceso denegado"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "Song not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Canción no encontrada"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Error al actualizar imagen: <mensaje>"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/songs/user/:idAppUser/lastest": {
+      "get": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Lastest song",
+        "description": "Returns the lastest song og the given user.",
+        "parameters": [
+          {
+            "name": "idAppUser",
+            "in": "path",
+            "description": "ID of the user (AppUser) whose songs are to be retrieved",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of user songs returned successfully.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "idSong": {
+                  "type": "number",
+                  "example": 1
+                },
+                "songName": {
+                  "type": "string",
+                  "example": "Canción de Prueba"
+                },
+                "fileName": {
+                  "type": "string",
+                  "example": "cancion_prueba.mp3"
+                },
+                "durationSeconds": {
+                  "type": "number",
+                  "example": 180
+                },
+                "releaseDate": {
+                  "type": "string",
+                  "example": "2025-05-14T00:15:46.000Z"
+                },
+                "isDeleted": {
+                  "type": "boolean",
+                  "example": false
+                },
+                "idSongGenre": {
+                  "type": "number",
+                  "example": 1
+                },
+                "idSongExtension": {
+                  "type": "number",
+                  "example": 1
+                },
+                "userName": {
+                  "type": "string",
+                  "example": "juanito"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "Example of descriptions"
+                },
+                "pathImageUrl": {
+                  "type": "string",
+                  "example": "protocol://host/rute/file.extension"
+                },
+                "visualizations": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "idVisualizations": {
+                        "type": "number",
+                        "example": 2
+                      },
+                      "playCount": {
+                        "type": "number",
+                        "example": 15
+                      },
+                      "period": {
+                        "type": "string",
+                        "example": "2025-05-12"
+                      },
+                      "idSong": {
+                        "type": "number",
+                        "example": 1
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid user ID"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/songs/user/:idAppUser": {
+      "get": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Get all songs created by a user",
+        "description": "Returns a list of all songs uploaded by a given user.",
+        "parameters": [
+          {
+            "name": "idAppUser",
+            "in": "path",
+            "description": "ID of the user (AppUser) whose songs are to be retrieved",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of user songs returned successfully.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "idSong": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "songName": {
+                    "type": "string",
+                    "example": "Canción de Prueba"
+                  },
+                  "fileName": {
+                    "type": "string",
+                    "example": "cancion_prueba.mp3"
+                  },
+                  "durationSeconds": {
+                    "type": "number",
+                    "example": 180
+                  },
+                  "releaseDate": {
+                    "type": "string",
+                    "example": "2025-05-14T00:15:46.000Z"
+                  },
+                  "isDeleted": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "idSongGenre": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "idSongExtension": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "userName": {
+                    "type": "string",
+                    "example": "juanito"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Example of descriptions"
+                  },
+                  "pathImageUrl": {
+                    "type": "string",
+                    "example": "protocol://host/rute/file.extension"
+                  },
+                  "visualizations": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "idVisualizations": {
+                          "type": "number",
+                          "example": 2
+                        },
+                        "playCount": {
+                          "type": "number",
+                          "example": 15
+                        },
+                        "period": {
+                          "type": "string",
+                          "example": "2025-05-12"
+                        },
+                        "idSong": {
+                          "type": "number",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid user ID"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/songs/search": {
+      "get": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Get most popular songs with optional filters",
+        "description": "Recovers the most popular songs. Se debe enviar al menos uno de los filtros: songName, artistName o idGenre.",
+        "parameters": [
+          {
+            "name": "songName",
+            "in": "query",
+            "description": "Name of the song",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "artistName",
+            "in": "query",
+            "description": "the name of the author of the song",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "idGenre",
+            "in": "query",
+            "description": "idgenre of song",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "integer"
+                },
+                "default": {
+                  "type": "number",
+                  "example": 10
+                },
+                "minimum": {
+                  "type": "number",
+                  "example": 1
+                },
+                "maximum": {
+                  "type": "number",
+                  "example": 60
+                }
+              }
+            },
+            "description": "Máximo número de canciones a devolver (default: 10)."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "integer"
+                },
+                "default": {
+                  "type": "number",
+                  "example": 0
+                },
+                "minimum": {
+                  "type": "number",
+                  "example": 0
+                }
+              }
+            },
+            "description": "Número de canciones a omitir (default: 0)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de canciones devuelta exitosamente.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "idSong": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "songName": {
+                    "type": "string",
+                    "example": "Canción de Prueba"
+                  },
+                  "fileName": {
+                    "type": "string",
+                    "example": "cancion_prueba.mp3"
+                  },
+                  "durationSeconds": {
+                    "type": "number",
+                    "example": 180
+                  },
+                  "releaseDate": {
+                    "type": "string",
+                    "example": "2025-05-14T00:15:46.000Z"
+                  },
+                  "isDeleted": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "idSongGenre": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "idSongExtension": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "userName": {
+                    "type": "string",
+                    "example": "juanito"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Example of descriptions"
+                  },
+                  "pathImageUrl": {
+                    "type": "string",
+                    "example": "protocol://host/route/file.extension"
+                  },
+                  "visualizations": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "idVisualizations": {
+                          "type": "number",
+                          "example": 2
+                        },
+                        "playCount": {
+                          "type": "number",
+                          "example": 15
+                        },
+                        "period": {
+                          "type": "string",
+                          "example": "2025-05-12"
+                        },
+                        "idSong": {
+                          "type": "number",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Faltan todos los filtros obligatorios (se requiere al menos uno).",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Debes enviar al menos uno de estos parámetros en query: songName, artistName o idGenre."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Mensaje de error genérico."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }

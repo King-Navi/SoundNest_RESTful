@@ -23,16 +23,17 @@ const httpPort = 6970;
 const credentials = loadTLSCredentials();
 
 const playlistImagePath = process.env.PLAYLIST_IMAGE_PATH_JS;
+const songImagePath = process.env.SONGS_IMAGE_PATH_JS;
 
 app.use(express.json());
-app.use("/api/auth", authRoutes);
+app.use(authRoutes);
 app.use(commentRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use(playlistRoutes);
 app.use(songRutes);
 app.use(userRutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
-//TODO: MORE SECURITY or no?:
+app.use("/images/songs", express.static(path.resolve(songImagePath)));
 app.use("/images/playlists", express.static(path.resolve(playlistImagePath)));
 app.use((err, req, res, next) => {
   if (

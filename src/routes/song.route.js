@@ -7,33 +7,225 @@ const {
   getSongRecentController,
   getMostPopularSongsController,
   searchSongController,
-  allUserSongController,
+  getSongOfUserController,
+  getLastUserSongController,
+  updateImageSongController,
+  deleteSongController,
 } = require("../controllers/song.controller");
-const {validateSearchQuery} = require('../middlewares/validateSongSearch.middleware');
+const {
+  validateSearchQuery,
+} = require("../middlewares/validateSongSearch.middleware");
+const {
+  validateParams,
+  idParamSchema,
+} = require("../middlewares/validateIdParams.middleware");
+const autoriztion = require("../middlewares/auth.middleware");
+const validateFileType = require("../middlewares/validateFileType");
+const validateSongId = require("../middlewares/validateSongId.middleware");
+const validateSongOwnership = require("../middlewares/validateSongOwnership.middleware");
+const upload = require("../middlewares/uploadSongImage.middleware");
 const router = express.Router();
 /*
 TODO:
-WITH JWT:
-PATCH ADD/UPPDATE SONG PHOTO OR NAME OR DESCRIPTION
-DELETE SONG
 
-ver forma de recuperar el path y descripcion en el modelo songs
-
-
-GET ALL SONGS BY USER
-GET MOST RECENT SONG USER UPLOAD
+EDITAR DESCRIPCION SONG
+RECUPERAR DESCRIPCION SONG
+EN GRPC FALTA descripcion en el modelo songs
 */
 const SONG_BASIC_ROUTE = "/api/songs";
-router.use(
+
+router.delete(
   /*
-  #swagger.path = '/api/songs/:userid/user'
+  #swagger.path = '/api/songs/:idsong/delete'
+  #swagger.tags = ['Songs']
+  #swagger.summary = 'Delete a song'
+  #swagger.description = 'Deletes a song by its ID. Removes associated image and audio, then marks the record as deleted. Only the owner or an admin may perform this action.'
+
+  #swagger.parameters['idsong'] = {
+    description: 'ID of the song whose image will be deleted',
+    required: true,
+    type: 'integer'
+  }
   */
-  `${SONG_BASIC_ROUTE}/:userid/use`,
-  allUserSongController,  
+  `${SONG_BASIC_ROUTE}/:idsong/delete`,
+  autoriztion,
+  validateSongId,
+  validateSongOwnership,
+  deleteSongController
 );
 
+router.patch(
+  /*
+    #swagger.path = '/api/songs/:idsong/image'
+    #swagger.tags = ['Songs']
+    #swagger.summary = 'Upload or update an image for a song'
+    #swagger.description = 'Allows a user to upload or replace the image associated with a song. Only the owner of the song or an admin can perform this action.'
 
-router.use(
+    #swagger.consumes = ['multipart/form-data']
+
+    #swagger.parameters['idsong'] = {
+      in: 'path',
+      description: 'ID of the song whose image will be updated',
+      required: true,
+      type: 'integer'
+    }
+
+    #swagger.parameters['imagefile'] = {
+      in: 'formData',
+      type: 'file',
+      required: true,
+      description: 'Image file to be uploaded. Must be PNG or JPEG.',
+      imagesTypes: ['image/png', 'image/jpeg']
+    }
+
+    #swagger.responses[400] = {
+      description: 'Invalid file or missing required data',
+      schema: { error: 'File not provided' }
+    }
+
+    #swagger.responses[403] = {
+      description: 'User is not authorized to update this song image',
+      schema: { error: 'Acceso denegado' }
+    }
+
+    #swagger.responses[404] = {
+      description: 'Song not found',
+      schema: { error: 'Canción no encontrada' }
+    }
+
+    #swagger.responses[500] = {
+      description: 'Internal server error',
+      schema: { error: 'Error al actualizar imagen: <mensaje>' }
+    }
+  */
+  `${SONG_BASIC_ROUTE}/:idsong/image`,
+  autoriztion,
+  validateSongId,
+  validateSongOwnership,
+  upload.single("imagefile"),
+  validateFileType,
+  updateImageSongController
+);
+
+router.get(
+  /*
+    #swagger.path = '/api/songs/user/:idAppUser/lastest'
+    #swagger.tags = ['Songs']
+    #swagger.summary = 'Lastest song'
+    #swagger.description = 'Returns the lastest song og the given user.'
+
+    #swagger.parameters['idAppUser'] = {
+      in: 'path',
+      description: 'ID of the user (AppUser) whose songs are to be retrieved',
+      required: true,
+      type: 'integer'
+    }
+
+    #swagger.responses[200] = {
+      description: 'List of user songs returned successfully.',
+      schema: {
+        idSong: 1,
+        songName: "Canción de Prueba",
+        fileName: "cancion_prueba.mp3",
+        durationSeconds: 180,
+        releaseDate: "2025-05-14T00:15:46.000Z",
+        isDeleted: false,
+        idSongGenre: 1,
+        idSongExtension: 1,
+        userName: "juanito",
+        description: "Example of descriptions",
+        pathImageUrl: "protocol://host/rute/file.extension",
+        visualizations: [
+          {
+            idVisualizations: 1,
+            playCount: 10,
+            period: "2025-05-01",
+            idSong: 1
+          },
+          {
+            idVisualizations: 2,
+            playCount: 15,
+            period: "2025-05-12",
+            idSong: 1
+          }
+        ]
+      }
+    
+    }
+
+    #swagger.responses[400] = {
+      description: 'Invalid user ID'
+    }
+
+    #swagger.responses[500] = {
+      description: 'Internal server error'
+    }
+  */
+  `${SONG_BASIC_ROUTE}/user/:idAppUser/lastest`,
+  validateParams(idParamSchema),
+  getLastUserSongController
+);
+
+router.get(
+  /*
+    #swagger.path = '/api/songs/user/:idAppUser'
+    #swagger.tags = ['Songs']
+    #swagger.summary = 'Get all songs created by a user'
+    #swagger.description = 'Returns a list of all songs uploaded by a given user.'
+
+    #swagger.parameters['idAppUser'] = {
+      in: 'path',
+      description: 'ID of the user (AppUser) whose songs are to be retrieved',
+      required: true,
+      type: 'integer'
+    }
+
+    #swagger.responses[200] = {
+      description: 'List of user songs returned successfully.',
+      schema: [{
+        idSong: 1,
+        songName: "Canción de Prueba",
+        fileName: "cancion_prueba.mp3",
+        durationSeconds: 180,
+        releaseDate: "2025-05-14T00:15:46.000Z",
+        isDeleted: false,
+        idSongGenre: 1,
+        idSongExtension: 1,
+        userName: "juanito",
+        description: "Example of descriptions",
+        pathImageUrl: "protocol://host/rute/file.extension",
+        visualizations: [
+          {
+            idVisualizations: 1,
+            playCount: 10,
+            period: "2025-05-01",
+            idSong: 1
+          },
+          {
+            idVisualizations: 2,
+            playCount: 15,
+            period: "2025-05-12",
+            idSong: 1
+          }
+        ]
+      }
+    ]
+    }
+
+    #swagger.responses[400] = {
+      description: 'Invalid user ID'
+    }
+
+    #swagger.responses[500] = {
+      description: 'Internal server error'
+    }
+  */
+  `${SONG_BASIC_ROUTE}/user/:idAppUser`,
+  validateParams(idParamSchema),
+  getSongOfUserController
+);
+
+router.get(
   /*
   #swagger.path = '/api/songs/search'
     #swagger.tags = ['Songs']
@@ -44,21 +236,18 @@ router.use(
       description: 'Name of the song',
       required: false,
       type: 'string',
-      schema: { example: Hola }
     }
     #swagger.parameters['artistName'] = {
       in: 'query',
       description: 'the name of the author of the song',
       required: false,
       type: 'string',
-      schema: { example: 2025 }
     }
     #swagger.parameters['idGenre'] = {
       in: 'query',
       description: 'idgenre of song',
       required: false,
       type: 'integer',
-      schema: { example: 1 , minimum: 1 }
     }
      #swagger.parameters['limit'] = {
       in: 'query',
@@ -117,11 +306,11 @@ router.use(
   */
   `${SONG_BASIC_ROUTE}/search`,
   validateSearchQuery,
-  searchSongController,  
+  searchSongController
 );
 
 router.get(
-/*
+  /*
     #swagger.path = '/api/songs/:amount/popular/:year/:month'
     #swagger.tags = ['Songs']
     #swagger.summary = 'Get most popular songs by month'
@@ -191,7 +380,7 @@ router.get(
       schema: { error: "Failed to fetch popular songs: <message>" }
     }
   */
-`${SONG_BASIC_ROUTE}/:amount/popular/:year/:month`,
+  `${SONG_BASIC_ROUTE}/:amount/popular/:year/:month`,
   getMostPopularSongsController
 );
 
@@ -296,7 +485,8 @@ router.get(
             idSong: 1
           }
         ]
-}]
+      }
+    ]
     }
     #swagger.responses[400] = {
       "error": "Invalid or missing amount"

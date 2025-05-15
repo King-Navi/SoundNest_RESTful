@@ -73,7 +73,9 @@ async function updateUser(userId, updateData) {
       filteredData[key] = updateData[key];
     }
   });
-  
+  if (filteredData.password) {
+    filteredData.password = await hashPassword(filteredData.password);
+  }
   let updatedUser;
 
   try {
@@ -97,7 +99,12 @@ async function getUserById(userId) {
     throw new ValidationError("User ID is required");
   }
   try {
-    const user = await userRepository.findUserById(userId);
+    const userInstance = await userRepository.findUserById(userId);
+    if (!userInstance) return null;
+
+    const user = userInstance.get({ plain: true });
+    delete user.password;
+
     return user;
 
   } catch (error) {
