@@ -5,7 +5,7 @@ const { NotFoundError } = require("../repositories/exceptions/song.exceptions");
 async function validateSongId(req, res, next) {
   const schema = Joi.object({
     idsong: Joi.number().integer().positive().required(),
-  });
+  }).unknown(true);
 
   const { error } = schema.validate(req.params);
 

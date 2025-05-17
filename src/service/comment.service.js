@@ -42,10 +42,6 @@ async function getCommentById(commentId) {
     throw new Error('Error al obtener el comentario');
   }
 }
-async function getRawCommentAuthorId(commentId) {
-  const comment = await commentRepository.getRawCommentById(commentId);
-  return comment ? comment.author_id?.toString() : null;
-}
 
 async function addResponseToComment(commentId, user, message) {
   try {
@@ -106,5 +102,4 @@ module.exports = {
   getCommentById,
   addResponseToComment,
   deleteComment,
-  getRawCommentAuthorId
 };

@@ -78,7 +78,7 @@ class CommentRepository {
     return await Comment.findById(commentId).lean();
   }
 
-  async addResponseToComment(parentCommentId, user, message) {
+  async addResponseToComment(parentCommentId, user, message, userId) {
     const parentComment = await Comment.findById(parentCommentId);
   if (!parentComment) {
     throw new Error('Comentario padre no encontrado');
@@ -86,6 +86,7 @@ class CommentRepository {
 
   const respuesta = new Comment({
     song_id: parentComment.song_id,
+    author_id: userId, 
     user,
     message,
     parent_id: parentCommentId

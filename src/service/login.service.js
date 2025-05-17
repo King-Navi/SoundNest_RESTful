@@ -16,7 +16,6 @@ async function loginService({ username, password }) {
   }
 
   const token = generateToken(user);
-
   return { token };
 }
 

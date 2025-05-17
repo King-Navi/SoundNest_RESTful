@@ -20,8 +20,12 @@ const playlistSchema = new mongoose.Schema({
   songs: [{
     song_id: {
       type: Number,
-      required: true
+      required: false
     },
+    addedAt: {
+      type: Date,
+      default: Date.now
+    }
   }],
   createdAt: {
     type: Date,

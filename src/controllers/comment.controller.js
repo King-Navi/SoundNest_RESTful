@@ -13,7 +13,7 @@ async function createComment(req, res) {
     res.status(204).send();
   } catch (error) {
     if (error instanceof ValidationError) {
-      return res.status(400).json({ error: error.message });
+      return res.status(404).json({ error: error.message });
 
     }
     if (error instanceof NonexistentSong) {
@@ -25,6 +25,7 @@ async function createComment(req, res) {
 }
 
 async function getCommentsBySong(req, res) {
+  console.log("hOLA")
   const { song_id } = req.params;
   try {
     const comentarios = await commentService.getCommentsBySong(Number(song_id));
@@ -61,18 +62,18 @@ async function addResponseToComment(req, res) {
   }
 }
 
-async function deleteComment(req, res) {
+async function deleteCommentController(req, res) {
   const commentId = req.params.id;
   const {id:userId, role: userIdRol }= req.user;
 
   try {
-    const comment = await commentService.getRawCommentAuthorId(commentId);
-
+    const comment = await commentService.getCommentById(commentId);
+    console.log('DEBUG - Comentario completo:', comment);
      if (!comment) {
       return res.status(404).json({ message: 'Comentario no encontrado' });
     }
 
-    if (comment.author_id !== userId && userIdRol !== 2) {
+    if (comment.author_id !== Number(userId) && userIdRol !== 2) {
       return res.status(403).json({ message: 'No tienes permiso para eliminar este comentario' });
     }
 
@@ -91,5 +92,5 @@ module.exports = {
   getCommentsBySong,
   getCommentById,
   addResponseToComment,
-  deleteComment,
+  deleteCommentController,
 };

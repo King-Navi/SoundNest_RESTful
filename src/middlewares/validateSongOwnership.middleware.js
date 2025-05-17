@@ -6,10 +6,6 @@ async function validateSongOwnership (req, res, next){
   }
   const isAdmin = Number(req.user.role) === ID_ROLE_ADMIN;
   const isAuthor = Number(song.idAppUser) === Number(req.user.id);
-  console.log("Quien es considerado admin")
-  console.log(ID_ROLE_ADMIN)
-  console.log("Quien solicita")
-  console.log(req.user.id)
   if (!isAdmin && !isAuthor) {
     return res.status(403).json({ error: 'Acceso denegado' });
   }

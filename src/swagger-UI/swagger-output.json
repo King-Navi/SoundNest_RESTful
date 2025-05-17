@@ -415,19 +415,6 @@
                     }
                   }
                 },
-                "password": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "example": {
-                      "type": "string",
-                      "example": "newPassword123"
-                    }
-                  }
-                },
                 "additionalInformation": {
                   "type": "object",
                   "properties": {
@@ -477,7 +464,144 @@
         }
       }
     },
-    "/api/comment/{commentId}/respondComment": {
+    "/api/user/editUserPassword": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Change user password",
+        "description": "Allows the authenticated user to update their password using a verification code sent to their email. The email must match the one in the JWT token.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "Bearer token (JWT) for user authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Verification code and new password to update the current password",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "example": "a1B2c3"
+                },
+                "newPassword": {
+                  "type": "string",
+                  "example": "MyNewStrongPassword456"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Invalid code or validation error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Invalid code"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - missing or invalid JWT",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "No token provided"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "403": {
+            "description": "The email in the token does not match the body email",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Email does not match token"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "User not found"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "428": {
+            "description": "Precondition Required - the code has expired or was never sent",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Code expired or not found"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Server error while trying to update password",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Failed to update password"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/comment/:commentId/respondComment": {
       "post": {
         "tags": [
           "Comments"
@@ -486,17 +610,17 @@
         "description": "",
         "parameters": [
           {
-            "name": "commentId",
-            "in": "path",
-            "required": true,
-            "type": "integer",
-            "description": "ID del comentario al que se desea responder",
-            "example": 5
-          },
-          {
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "commentId",
+            "in": "path",
+            "description": "ID del comentario al que se desea responder",
+            "required": true,
+            "type": "integer",
+            "example": 5
           },
           {
             "name": "body",
@@ -655,7 +779,7 @@
         }
       }
     },
-    "/api/comment/getComment/:song_id/comments": {
+    "/api/comment/getComment/:song_id": {
       "get": {
         "tags": [
           "Comments"
@@ -792,7 +916,7 @@
         }
       }
     },
-    "/api/comment/delete/{id}": {
+    "/api/comment/delete/:id": {
       "delete": {
         "tags": [
           "Comments"
@@ -801,15 +925,15 @@
         "description": "",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "ID del comentario (ej: 681457a757562da3002c02d6)"
-          },
-          {
             "name": "authorization",
             "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID del comentario (ej: 681457a757562da3002c02d6)",
+            "required": true,
             "type": "string"
           }
         ],
@@ -2355,6 +2479,651 @@
           },
           "500": {
             "description": "Server error while fetching extensions"
+          }
+        }
+      }
+    },
+    "/api/playlist/{iduser}/user": {
+      "get": {
+        "tags": [
+          "Playlists"
+        ],
+        "summary": "Get all playlists by user ID",
+        "description": "Returns all playlists created by the specified user. Each playlist includes its metadata and the list of songs added.",
+        "parameters": [
+          {
+            "name": "iduser",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "Numeric ID of the user whose playlists will be fetched",
+            "example": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of playlists successfully retrieved",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "playlists": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "_id": {
+                        "type": "string",
+                        "example": "6827f677c85a6289a67f363d"
+                      },
+                      "creator_id": {
+                        "type": "number",
+                        "example": 2
+                      },
+                      "playlist_name": {
+                        "type": "string",
+                        "example": "pruebas"
+                      },
+                      "description": {
+                        "type": "string",
+                        "example": "adaddadada"
+                      },
+                      "image_path": {
+                        "type": "string",
+                        "example": "bf7b7514-d1c0-45cf-9924-2fc6da45da50.png"
+                      },
+                      "songs": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "song_id": {
+                              "type": "number",
+                              "example": 1
+                            },
+                            "addedAt": {
+                              "type": "string",
+                              "example": "2025-05-17T02:43:20.530Z"
+                            },
+                            "_id": {
+                              "type": "string",
+                              "example": "6827f7c8923bf2c987721306"
+                            }
+                          }
+                        }
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "example": "2025-05-17T02:37:43.622Z"
+                      },
+                      "__v": {
+                        "type": "number",
+                        "example": 3
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Error trying to fetch the playlist. CALL NAVI"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/playlist/:idsong/:idPlaylist/remove": {
+      "patch": {
+        "tags": [
+          "Playlists"
+        ],
+        "summary": "Remove a song from a playlist",
+        "description": "Removes a song from a playlist. Only the owner of the playlist or an administrator can perform this action. Throws an error if the song does not exist in the playlist.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "Bearer JWT token to authenticate the user"
+          },
+          {
+            "name": "idsong",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "Numeric ID of the song to be removed from the playlist"
+          },
+          {
+            "name": "idPlaylist",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the playlist from which the song will be removed"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Song successfully removed from playlist (no content)"
+          },
+          "400": {
+            "description": "Invalid input or bad request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Invalid ID format or request"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid authorization token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "No token provided"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "403": {
+            "description": "User is not authorized to modify the playlist",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Access denied"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "Playlist not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Playlist not found"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "409": {
+            "description": "Song is not in the playlist",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Song 1 is not in the playlist"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Internal error trying to remove song from playlist"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/playlist/:idsong/:idPlaylist:/add": {
+      "patch": {
+        "tags": [
+          "Playlists"
+        ],
+        "summary": "Add a song to a playlist",
+        "description": "Adds a song (by its ID) to a playlist (by its ID). Only the playlist owner or an admin is authorized to perform this action. Duplicate songs are not allowed.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "Bearer JWT token to authenticate the user"
+          },
+          {
+            "name": "idsong",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "Numeric ID of the song to be added to the playlist"
+          },
+          {
+            "name": "idPlaylist",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the playlist to which the song will be added"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Song successfully added to playlist (no content)"
+          },
+          "400": {
+            "description": "Invalid ID format or other bad request error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Invalid song or playlist ID format"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid authorization token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "No token provided"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "403": {
+            "description": "User does not own the playlist or is not authorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Access denied"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "Playlist or song not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Playlist not found"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "409": {
+            "description": "The song is already in the playlist",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Song 1 is already in the playlist"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Internal error trying to add song to playlist"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/playlist/:idPlaylist/delete": {
+      "delete": {
+        "tags": [
+          "Playlists"
+        ],
+        "summary": "Eliminar una playlist",
+        "description": "Elimina una playlist del sistema. Solo puede hacerlo el propietario o un administrador. También elimina la imagen asociada del sistema de archivos.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "Bearer token JWT para autenticar al usuario"
+          },
+          {
+            "name": "idPlaylist",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID de la playlist a eliminar"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Playlist eliminada correctamente"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Token no proporcionado o inválido",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "No token provided"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "403": {
+            "description": "El usuario no tiene permisos para eliminar esta playlist",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Access denied"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "La playlist no existe o ya fue eliminada",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Playlist not found or already deleted"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Error trying to delete the playlist. CALL NAVI"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/playlists/upload": {
+      "put": {
+        "tags": [
+          "Playlists"
+        ],
+        "summary": "Crear una nueva playlist con imagen",
+        "description": "Permite a un usuario autenticado subir una nueva playlist con su imagen asociada. La imagen debe ser PNG o JPG. El nombre de la playlist es obligatorio. Se guarda en el servidor y se registra en la base de datos.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "Bearer token JWT para autenticar al usuario"
+          },
+          {
+            "name": "image",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "Imagen PNG o JPG de la playlist (máx. 20MB)"
+          },
+          {
+            "name": "playlistName",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "description": "Nombre de la playlist"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "type": "string",
+            "required": false,
+            "description": "Descripción opcional de la playlist"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "playlistName": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Playlist creada correctamente",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Playlist created successfully"
+                },
+                "playlist": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "string",
+                      "example": "68267d8ec27bdad6076766f8"
+                    },
+                    "creator_id": {
+                      "type": "number",
+                      "example": 3
+                    },
+                    "playlist_name": {
+                      "type": "string",
+                      "example": "pruebas"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "adaddadada"
+                    },
+                    "image_path": {
+                      "type": "string",
+                      "example": "6f975260-38b9-4acf-a072-c6c49377d742.png"
+                    },
+                    "songs": {
+                      "type": "array",
+                      "example": [],
+                      "items": {}
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "example": "2025-05-15T23:49:34.319Z"
+                    },
+                    "__v": {
+                      "type": "number",
+                      "example": 0
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Falta algún campo obligatorio o archivo inválido",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "File not provided"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Token no proporcionado",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "No token provided"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "403": {
+            "description": "Token inválido o expirado",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Invalid or expired token"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Failed to process image upload"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }

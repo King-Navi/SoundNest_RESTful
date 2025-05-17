@@ -17,10 +17,8 @@ async function validateFileType(req, res, next) {
     const type = await fileType.fileTypeFromFile(req.file.path);
 
     if (!type || !["image/jpeg", "image/png"].includes(type.mime)) {
-      await fs.promises.unlink(req._tmpDirPath, {
-        recursive: true,
-        force: true,
-      });
+      await await fs.promises.unlink(req.file.path);
+
       return res
         .status(400)
         .json({ error: "Invalid file type. Only PNG and JPG are allowed." });

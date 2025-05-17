@@ -79,7 +79,7 @@ async function findUserById(id) {
   try {
     const user = await AppUser.findByPk(id);
     if (!user) {
-      throw new Error("User not found.");
+      throw new Error("User not found. Id" +id);
     }
     return user;
   } catch (error) {

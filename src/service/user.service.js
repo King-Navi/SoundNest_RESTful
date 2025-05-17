@@ -8,12 +8,21 @@ const {
 const { ValidationError } = require("../utils/exceptions/validation.exception");
 const { hashPassword } = require("../utils/hash.util");
 const NoChangesError = require("../repositories/exceptions/noChangesError");
-const additionalInfoRepository = require('../repositories/additionalInfo.mongo.repository');
-
+const additionalInfoRepository = require("../repositories/additionalInfo.mongo.repository");
 const ID_LISTENER = 1;
 const MAX_PASSWORD_LENGTH = 256;
 const MAX_USERNAME_LENGTH = 100;
 const MAX_EMAIL_LENGTH = 100;
+
+async function editPassword(userId, newPassword) {
+  const user = await getUserById(userId);
+  if (!user) {
+    throw new ValidationError("User not found");
+  }
+
+  const hashed = await hashPassword(newPassword);
+  await userRepository.updateUserById(userId, { password: hashed });
+}
 
 async function registerUser({
   nameUser,
@@ -73,8 +82,8 @@ async function updateUser(userId, updateData) {
       filteredData[key] = updateData[key];
     }
   });
-  if (filteredData.password) {
-    filteredData.password = await hashPassword(filteredData.password);
+  if ("password" in filteredData) {
+    delete filteredData.password;
   }
   let updatedUser;
 
@@ -84,7 +93,7 @@ async function updateUser(userId, updateData) {
     if (!(err instanceof NoChangesError)) throw err;
   }
 
-  if ('additionalInformation' in filteredData) {
+  if ("additionalInformation" in filteredData) {
     await additionalInfoRepository.saveAdditionalInformation(
       userId,
       filteredData.additionalInformation
@@ -106,9 +115,8 @@ async function getUserById(userId) {
     delete user.password;
 
     return user;
-
   } catch (error) {
-    throw error
+    throw error;
   }
 }
 
@@ -116,4 +124,5 @@ module.exports = {
   registerUser,
   updateUser,
   getUserById,
+  editPassword,
 };

@@ -1,11 +1,79 @@
-const { getImageUrl } = require("../service/playlist.service");
+const { 
+  createPlaylistService, 
+  deletePlaylistService, 
+  addSongToPlaylistService,
+  removeSongToPlaylistService,
+  getPlaylistService,
+} = require("../service/playlist.service");
+const {NonexistentPlaylist, SongAlreadyInPlaylist, SongNotInPlaylist} =require('../service/exceptions/exceptions'); 
 
-const uploadPlaylistImageController = (req, res) => {
-
-  const { title, description } = req.body;
-  const userId = req.user.id;
-
+async function fecthPlaylistController(req, res) {
   try {
+    const { iduser } = req.params;
+    const playlists = await getPlaylistService(iduser);
+    return res.status(200).json({ playlists });
+  } catch (error) {
+    if (error instanceof NonexistentPlaylist) {
+      return res.status(404).json({ error: error.message});
+    }
+    console.warn(error)
+    res.status(500).json({ error: "Error trying to delete the playlsit CALL NAVI "});
+  }
+}
+
+async function removeSongToPlaylistController(req, res) {
+  try {
+    const { idPlaylist, idsong } = req.params
+    await removeSongToPlaylistService(idPlaylist, idsong);
+    res.status(204).send();
+  } catch (error) {
+    if (error instanceof NonexistentPlaylist) {
+      return res.status(404).json({ error: error.message});
+    }
+    if (error instanceof SongNotInPlaylist) {
+      return res.status(error.statusCode).json({ error: error.message});
+    }
+    console.warn(error)
+    res.status(500).json({ error: "Error trying to delete the playlsit CALL NAVI "});
+  }
+}
+
+
+async function addSongToPlaylistController(req, res) {
+  try {
+    const { idPlaylist, idsong } = req.params
+    await addSongToPlaylistService(idPlaylist, idsong);
+    res.status(204).send();
+  } catch (error) {
+    if (error instanceof NonexistentPlaylist) {
+      return res.status(404).json({ error: error.message});
+    }
+    if (error instanceof SongAlreadyInPlaylist) {
+      return res.status(error.statusCode).json({ error: error.message});
+    }
+    console.warn(error)
+    res.status(500).json({ error: "Error trying to delete the playlsit CALL NAVI "});
+  }
+}
+
+
+async function deletePlaylistController(req, res) {
+  try {
+    const { idPlaylist } = req.params
+    await deletePlaylistService(idPlaylist);
+    res.status(204).send();
+  } catch (error) {
+    if (error instanceof NonexistentPlaylist) {
+      return res.status(404).json({ error: error.message});
+    }
+    res.status(500).json({ error: "Error trying to delete the playlsit CALL NAVI "});
+  }
+}
+
+async function uploadPlaylistImageController(req, res) {
+  try {
+    const { playlistName, description } = req.body;
+    const userId = req.user.id;
     /*
     file
     {
@@ -19,23 +87,32 @@ const uploadPlaylistImageController = (req, res) => {
       size: 458721
     }
     */
-    const filename = req.file.filename;
-    const imageUrl = getImageUrl(req.protocol, req.get("host"), filename);
-
-    res.json({
-      message: "Image uploaded successfully",
-      url: imageUrl,
-      userId: userId,
-      metadata: {
-        title,
-        description
-      }
+    const fileName = req._uploadedFileName;
+    const tempPath = req.file.path;
+    if (!fileName || !tempPath) {
+      return res.status(400).json({ error: 'Missing uploaded file or path' });
+    }
+    const playlist = await createPlaylistService({
+      userId,
+      playlistName,
+      description,
+      fileName,
+      tempPath,
+    });
+    return res.status(201).json({
+      message: 'Playlist created successfully',
+      playlist,
     });
   } catch (error) {
-    res.status(500).json({ error: "Failed to process image upload" });
+    console.error('[uploadPlaylistImageController] Error:', error);
+    res.status(500).json({ error: "Failed to process image upload. "});
   }
-};
+}
 
 module.exports = {
   uploadPlaylistImageController,
+  deletePlaylistController,
+  addSongToPlaylistController,
+  removeSongToPlaylistController,
+  fecthPlaylistController
 };

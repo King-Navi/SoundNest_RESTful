@@ -1,6 +1,6 @@
 const Joi = require("joi");
-const fs = require('fs');
-
+const fs = require("fs");
+const path = require('path');
 const playlistUploadSchema = Joi.object({
   playlistName: Joi.string().min(1).max(100).required(),
   description: Joi.string().max(500).allow("").optional(),
@@ -11,31 +11,32 @@ const playlistUploadSchema = Joi.object({
  * - If validation fails, the uploaded file (if any) is deleted from disk to avoid orphaned files.
  * - If validation succeeds, the cleaned `req.body` is passed to the next handler.
  */
-const validateNewPlaylist = () => {
-  return async (req, res, next) => {
-    const result = playlistUploadSchema.validate(req.body, {
-      abortEarly: false,
-      stripUnknown: true,
-    });
+async function validateNewPlaylist(req, res, next)  {
+  const result = playlistUploadSchema.validate(req.body, {
+    abortEarly: false,
+    stripUnknown: true,
+  });
 
-    if (result.error) {
+  if (result.error) {
+    try {
       try {
-        if (req.file && req.file.path) {
-            await fs.promises.unlink(req.file.path);
-        }
-        } catch (err) {
-        console.error('[validateNewPlaylist] Error deleting file:', err.message);
-        }
-
-      return res.status(400).json({
-        message: "Validation error",
-        details: result.error.details.map((d) => d.message),
-      });
+        const fileName = path.parse(req._uploadedFileName).name;
+        const extension = path.extname(req._uploadedFileName).replace('.', '');
+        await fileManager.deleteImage(fileName, extension);
+      } catch (cleanupError) {
+        console.warn('[createPlaylist] Failed to clean up file:', cleanupError.message);
+      }
+    } catch (err) {
+      console.error("[validateNewPlaylist] Error deleting file:", err.message);
     }
 
-    req.body = result.value;
-    next();
-  };
-};
+    return res.status(400).json({
+      message: "Validation error",
+      details: result.error.details.map((d) => d.message),
+    });
+  }
+  req.body = result.value;
+  next();
+}
 
 module.exports = validateNewPlaylist;

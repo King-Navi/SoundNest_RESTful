@@ -42,7 +42,7 @@ app.use((err, req, res, next) => {
   ) {
     return res.status(400).json({ error: err.message });
   }
-
+  console.error(error)
   return res.status(500).json({ error: "Unexpected CRITICAL server error" });
 });
 

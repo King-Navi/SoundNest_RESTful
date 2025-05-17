@@ -44,6 +44,9 @@ async function sendConfirmationCode(email ) {
     subject: "Your confirmation code",
     text: `Your confirmation code is: ${code}`,
   });
+  if (process.env.ENVIROMENT == 'development') {
+    console.debug(`[DEBUG] Confirmation code for ${email}: ${code}`);
+  }
   return true;
 }
 
@@ -58,7 +61,9 @@ async function sendConfirmationCode(email ) {
  * @see deleteCode
  */
 function verifyConfirmationCode(email, code) {
-
+  if (process.env.ENVIROMENT == 'development') {
+    console.debug(`[DEBUG] Verifying code for ${email}: ${code}`);
+  }
   const stored = getCode(email);
 
   if (!stored)

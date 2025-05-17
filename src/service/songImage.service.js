@@ -3,6 +3,8 @@ const fs = require("fs/promises");
 const SongRepository = require("../repositories/song.repository");
 const SongPhotoRepository = require("../repositories/songPhoto.repository");
 
+
+
 async function updateSongImage(songId, fileName, tmpDirPath) {
   const ext = path.extname(fileName);
   if (!ext) throw new Error("Extensión de archivo inválida");

@@ -27,6 +27,8 @@ const upload = require("../middlewares/uploadSongImage.middleware");
 const router = express.Router();
 /*
 TODO:
+RECUPERAR LISTA DE CANCIONES
+
 
 EDITAR DESCRIPCION SONG
 RECUPERAR DESCRIPCION SONG

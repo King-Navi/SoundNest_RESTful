@@ -36,7 +36,9 @@ const verifyToken = (req, res, next) => {
       email: decoded.email,
       role: decoded.role,
     };
-
+    if (process.env.ENVIROMENT == 'development') {
+      console.debug(`[DEBUG] decode for ${JSON.stringify(decoded, null, 1)}`);
+    }
     next();
   } catch (err) {
     console.error("[verifyToken] Token verification error:", err.message);

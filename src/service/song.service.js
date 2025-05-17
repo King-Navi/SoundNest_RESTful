@@ -1,7 +1,7 @@
 const { getAllGenres } = require("../repositories/songGenre.repository");
 const { getAllExtension } = require("../repositories/songExtension.repository");
 const FileManager = require("../utils/fileManager");
-const fileManager = new FileManager();
+const fileManager = new FileManager('SONGS_IMAGE_PATH_JS');
 const {
   getSongsByFilters,
   verifySongExists,

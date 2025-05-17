@@ -21,10 +21,6 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true });

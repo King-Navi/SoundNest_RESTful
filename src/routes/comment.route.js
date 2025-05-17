@@ -10,7 +10,7 @@ const COMMENT_BASIC_ROUTE = "/api/comment"
 
 router.post(
 /*
-#swagger.path = '/api/comment/{commentId}/respondComment'
+#swagger.path = '/api/comment/:commentId/respondComment'
 #swagger.tags = ['Comments']
 #swagger.summary = 'Responder a un comentario existente'
 #swagger.parameters['commentId'] = {
@@ -75,7 +75,7 @@ router.post(
 
 router.get(
 /*
-    #swagger.path = '/api/comment/getComment/:song_id/comments'
+    #swagger.path = '/api/comment/getComment/:song_id'
     #swagger.tags = ['Comments']
     #swagger.summary = 'Obtener comentarios por ID de canción'
     #swagger.parameters['song_id'] = {
@@ -100,7 +100,9 @@ router.get(
     #swagger.responses[404] = { description: 'No se encontraron comentarios' }
     #swagger.responses[500] = { description: 'Error del servidor' }
     */
-    '/getComment/:song_id/comments', commentController.getCommentsBySong);
+    `${COMMENT_BASIC_ROUTE}/getComment/:song_id`, 
+    commentController.getCommentsBySong
+);
 
 router.get(
     /*
@@ -135,7 +137,7 @@ router.get(
 
 router.delete(
 /*
-#swagger.path = '/api/comment/delete/{id}'
+#swagger.path = '/api/comment/delete/:id'
 #swagger.tags = ['Comments']
 #swagger.summary = 'Eliminar comentario por ID'
 #swagger.parameters['id'] = {
@@ -148,7 +150,9 @@ router.delete(
 #swagger.responses[404] = { description: 'Lack of permissions'}
 #swagger.responses[500] = { description: 'Error del servidor' }
 */
-    `${COMMENT_BASIC_ROUTE}/delete/:id`,authorization, commentController.deleteComment
+    `${COMMENT_BASIC_ROUTE}/delete/:id`,
+    authorization, 
+    commentController.deleteCommentController
 );
 
 module.exports = router;
