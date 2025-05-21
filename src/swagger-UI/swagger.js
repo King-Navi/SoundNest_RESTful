@@ -30,7 +30,8 @@ const endpointsFiles = [
   './src/routes/comment.route.js',
   './src/routes/notification.route.js',
   './src/routes/song.route.js',
-  './src/routes/playlist.route.js'
+  './src/routes/playlist.route.js',
+  './src/routes/visualization.route.js'
   //TODO: ¡add more routes here!
 ];
 

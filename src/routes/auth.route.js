@@ -7,8 +7,61 @@ const {
   compareCode,
 }= require("../controllers/user.controller");
 const {recoverUser} = require("../controllers/user.controller");
+const {UpdateFCMTokenController} = require("../controllers/auth.controller");
 
 const AUTH_BASIC_ROUTE = "/api/auth";
+
+router.post(
+    /*
+  #swagger.path = '/api/auth/fcm/update'
+  #swagger.tags = ['Auth']
+  #swagger.description = 'Register or update a user\'s FCM token. Requires JWT authorization.'
+
+  #swagger.security = [{
+    "BearerAuth": []
+  }]
+
+  #swagger.parameters['body'] = {
+    in: 'body',
+    required: true,
+    description: 'FCM token data for the authenticated user',
+    schema: {
+      token: 'fcm_token_string',
+      device: 'android',
+      platform_version: '13',
+      app_version: '1.2.3'
+    }
+  }
+
+  #swagger.responses[204] = {
+    description: 'FCM token registered or updated successfully (No Content)'
+  }
+
+  #swagger.responses[400] = {
+    description: 'Missing required fields',
+    schema: {
+      message: 'Missing user_id or token'
+    }
+  }
+
+  #swagger.responses[401] = {
+    description: 'Unauthorized - Missing or invalid token',
+    schema: {
+      message: 'No token provided'
+    }
+  }
+
+  #swagger.responses[500] = {
+    description: 'Internal server error while processing FCM token',
+    schema: {
+      message: 'Failed to update FCM token'
+    }
+  }
+  */
+  `${AUTH_BASIC_ROUTE}/fcm/update`,
+  authorization,
+  UpdateFCMTokenController
+);
 
 router.get(
   /*

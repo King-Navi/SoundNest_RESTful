@@ -1,7 +1,6 @@
 require("dotenv").config();
-const fs = require("fs").promises;
+const fs = require("fs-extra");
 const path = require("path");
-const RestClient = require("./externCommunication");
 
 class FileManager {
   /**
@@ -13,13 +12,12 @@ class FileManager {
       throw new Error(`Environment variable is not defined`);
     }
     this.imageDir = path.resolve(process.cwd(), dirPath);
-    this.restClient = new RestClient();
   }
   async moveTempImage(tempPath, fileName) {
     const targetPath = path.join(this.imageDir, fileName);
 
     try {
-      await fs.rename(tempPath, targetPath);
+      await fs.move(tempPath, targetPath, { overwrite: true });
       return targetPath;
     } catch (err) {
       console.error(`[moveTempImage] Failed to move image: ${err.message}`);
@@ -40,20 +38,6 @@ class FileManager {
       }
       console.error(`Error eliminando imagen ${fullPath}:`, err.message);
       throw err;
-    }
-  }
-
-  async requestRemoteDeleteSong(idSong) {
-    try {
-      const response = await this.restClient.delete(`/delete/song/${idSong}`);
-      console.log(`Song ${idSong} deleted remotely`);
-      return true;
-    } catch (err) {
-      console.error(
-        `CRITICAL: Failed to delete song ${idSong} remotely:`,
-        err.message
-      );
-      return false;
     }
   }
 }

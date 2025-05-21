@@ -43,9 +43,9 @@ async function getCommentById(commentId) {
   }
 }
 
-async function addResponseToComment(commentId, user, message) {
+async function addResponseToComment(commentId, user, message, idUser) {
   try {
-    return await commentRepository.addResponseToComment(commentId, user, message);
+    return await commentRepository.addResponseToComment(commentId, user, message,idUser);
   } catch (error) {
     console.error('Error al agregar la respuesta al comentario:', error);
     throw new Error('Error al agregar la respuesta');

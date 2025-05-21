@@ -79,7 +79,7 @@ class CommentRepository {
   }
 
   async addResponseToComment(parentCommentId, user, message, userId) {
-    const parentComment = await Comment.findById(parentCommentId);
+  const parentComment = await Comment.findById(parentCommentId);
   if (!parentComment) {
     throw new Error('Comentario padre no encontrado');
   }

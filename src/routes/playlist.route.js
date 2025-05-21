@@ -285,7 +285,7 @@ router.delete(
 
 router.put(
   /*
-    #swagger.path = '/api/playlists/upload'
+    #swagger.path = '/api/playlist/upload'
     #swagger.tags = ['Playlists']
     #swagger.summary = 'Crear una nueva playlist con imagen'
     #swagger.description = 'Permite a un usuario autenticado subir una nueva playlist con su imagen asociada. La imagen debe ser PNG o JPG. El nombre de la playlist es obligatorio. Se guarda en el servidor y se registra en la base de datos.'

@@ -1,21 +1,22 @@
 require("dotenv").config();
 const https = require("https");
 const http = require("http");
-const multer = require('multer');
+const multer = require("multer");
 const path = require("path");
 const express = require("express");
 const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("./swagger-UI/swagger-output.json");
 const { loadTLSCredentials } = require("./config/tlsConfig");
 const initializeDatabase = require("./config/database");
-
+const { connectWithRetry } = require("./config/rabbit");
+const { notificationConsumer } = require("./messaging/notification.consumer");
 const authRoutes = require("./routes/auth.route");
 const commentRoutes = require("./routes/comment.route");
 const notificationRoutes = require("./routes/notification.route");
 const playlistRoutes = require("./routes/playlist.route");
 const songRutes = require("./routes/song.route");
 const userRutes = require("./routes/user.route");
-
+const visualizationRutes = require("./routes/visualization.route");
 const app = express();
 const httpsPort = process.env.PORT || 3000;
 const httpPort = 6970;
@@ -32,6 +33,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use(playlistRoutes);
 app.use(songRutes);
 app.use(userRutes);
+app.use(visualizationRutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 app.use("/images/songs", express.static(path.resolve(songImagePath)));
 app.use("/images/playlists", express.static(path.resolve(playlistImagePath)));
@@ -42,12 +44,19 @@ app.use((err, req, res, next) => {
   ) {
     return res.status(400).json({ error: err.message });
   }
-  console.error(error)
+  console.error(error);
   return res.status(500).json({ error: "Unexpected CRITICAL server error" });
 });
 
 initializeDatabase()
-  .then(() => {
+  .then(async () => {
+    try {
+      await connectWithRetry();
+      await notificationConsumer();
+    } catch (err) {
+      console.error("RabbitMQ connection failed:", err);
+      process.exit(1);
+    }
     if (credentials) {
       https.createServer(credentials, app).listen(httpsPort, () => {
         console.log(`Server running on https://localhost:${httpsPort}`);

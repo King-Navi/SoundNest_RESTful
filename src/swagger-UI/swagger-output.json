@@ -12,6 +12,106 @@
     "http"
   ],
   "paths": {
+    "/api/auth/fcm/update": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Register or update a user\\'s FCM token. Requires JWT authorization.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "description": "FCM token data for the authenticated user",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "example": "fcm_token_string"
+                },
+                "device": {
+                  "type": "string",
+                  "example": "android"
+                },
+                "platform_version": {
+                  "type": "string",
+                  "example": "13"
+                },
+                "app_version": {
+                  "type": "string",
+                  "example": "1.2.3"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "FCM token registered or updated successfully (No Content)"
+          },
+          "400": {
+            "description": "Missing required fields",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Missing user_id or token"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "No token provided"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal server error while processing FCM token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Failed to update FCM token"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
     "/api/auth/validateJWT": {
       "get": {
         "tags": [
@@ -601,6 +701,156 @@
         }
       }
     },
+    "/api/user/get/aditionalInfo": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Retrieve additional user information",
+        "description": "\r  Returns additional information for the authenticated user.\r  **Structure of 'info':**\r  - The \\`info\\` object can contain any number of key-value pairs.\r  - Each key is a string, and each value must be an **array of strings**.\r  - This allows users to store flexible, categorized metadata (e.g., genres, interests, platforms).\r \r  **Warning:**\r  - The server does not validate the keys inside \\`info\\`; only the value format is expected (array of strings).\r  - Ensure consistent naming on the client side to avoid data fragmentation (e.g., avoid using both 'Genres' and 'genres').\r \r  **Example:**\r  {\r  \"info\": {\r  \"genres\": [\"rock\", \"electronic\"],\r  \"platforms\": [\"Instagram\", \"Spotify\"],\r  \"interests\": [\"coding\", \"DJing\"]\r  }\r  }\r  ",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "Bearer token (JWT) for user authentication"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Additional information retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "object"
+                    },
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "array"
+                        },
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "example": {
+                              "type": "string",
+                              "example": "example string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "example": {
+                      "type": "object",
+                      "properties": {
+                        "genres": {
+                          "type": "array",
+                          "example": [
+                            "rock",
+                            "electronic"
+                          ],
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "interests": {
+                          "type": "array",
+                          "example": [
+                            "coding",
+                            "music"
+                          ],
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "platforms": {
+                          "type": "array",
+                          "example": [
+                            "Instagram",
+                            "Spotify"
+                          ],
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - missing or invalid JWT",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "No token provided"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "No additional information found for this user",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "No additional information found for this user."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Server error while retrieving additional information",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Internal server error"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/comment/:commentId/respondComment": {
       "post": {
         "tags": [
@@ -779,7 +1029,7 @@
         }
       }
     },
-    "/api/comment/getComment/:song_id": {
+    "/api/comment/getComment/:song_id/song": {
       "get": {
         "tags": [
           "Comments"
@@ -849,7 +1099,7 @@
         }
       }
     },
-    "/api/comment/getComment/comment/:id": {
+    "/api/comment/:id/all": {
       "get": {
         "tags": [
           "Comments"
@@ -2951,7 +3201,7 @@
         }
       }
     },
-    "/api/playlists/upload": {
+    "/api/playlist/upload": {
       "put": {
         "tags": [
           "Playlists"
@@ -3118,6 +3368,298 @@
                 "error": {
                   "type": "string",
                   "example": "Failed to process image upload"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/visit/:idsong/increment": {
+      "post": {
+        "summary": "Increment or create monthly play count",
+        "description": "Increments the play count for the current month. If no record exists for that month, creates it with playCount=1.",
+        "parameters": [
+          {
+            "name": "idsong",
+            "in": "path",
+            "description": "ID of the song to increment",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/visit/top/:year/:month": {
+      "get": {
+        "summary": "Get top song IDs by plays in a month",
+        "description": "Returns an array of song IDs ordered by descending play count for the given month/year.",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "description": "Four-digit year (e.g. 2025)",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "description": "Month number (1–12)",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of song IDs to return (default: 10)",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "integer"
+                },
+                "default": {
+                  "type": "number",
+                  "example": 10
+                },
+                "minimum": {
+                  "type": "number",
+                  "example": 1
+                },
+                "maximum": {
+                  "type": "number",
+                  "example": 60
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/visit/:idsong/:year/:month": {
+      "get": {
+        "summary": "Get visualization record for a song in a month",
+        "description": "Returns the visualization object for a given song ID and month/year.",
+        "parameters": [
+          {
+            "name": "idsong",
+            "in": "path",
+            "description": "ID of the song",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "description": "Four-digit year",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "description": "Month number (1–12)",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Visualization record found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "idVisualizations": {
+                  "type": "number",
+                  "example": 1
+                },
+                "playCount": {
+                  "type": "number",
+                  "example": 10
+                },
+                "period": {
+                  "type": "string",
+                  "example": "2025-05-01"
+                },
+                "idSong": {
+                  "type": "number",
+                  "example": 42
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Missing or invalid parameters"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "No record found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "No visualization found for song ..."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Error message"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/visit/:idsong": {
+      "get": {
+        "summary": "List all visualizations for a song",
+        "description": "Returns an array of all visualization records for the specified song, ordered by period.",
+        "parameters": [
+          {
+            "name": "idsong",
+            "in": "path",
+            "description": "ID of the song",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of visualization objects",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "array"
+                },
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "idVisualizations": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "playCount": {
+                      "type": "number",
+                      "example": 15
+                    },
+                    "period": {
+                      "type": "string",
+                      "example": "2025-05-12"
+                    },
+                    "idSong": {
+                      "type": "number",
+                      "example": 42
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid song ID",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Invalid or missing song ID"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Error message"
                 }
               },
               "xml": {

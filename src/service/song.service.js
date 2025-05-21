@@ -23,7 +23,7 @@ const { getBySongPhotoId, deleteSongPhotoBySongId} = require("../repositories/so
 const { NotFoundError } = require("../repositories/exceptions/song.exceptions");
 const SongDescriptionRepository = require("../repositories/songDescription.mongo.reposiroty");
 const songDescriptionRepo = new SongDescriptionRepository();
-
+const {publishDeleteSong } = require("../messaging/deleteSong.producer")
 
 /**
  * Deletes all files associated with a song and its related photo.
@@ -60,7 +60,7 @@ async function deleteSongService(idSong) {
     await deleteSongPhotoBySongId(idSong);
   }
 
-  const audioDeleted = await fileManager.requestRemoteDeleteSong(idSong);
+  const audioDeleted = await publishDeleteSong(idSong);
   if (!audioDeleted) {
     throw new Error(`No se pudo eliminar el audio de la canción ${idSong}`);
   }
@@ -153,6 +153,10 @@ async function getRandom(amount) {
 
 async function getSong(idSong) {
   try {
+    const id = Number(idSong);
+    if (!Number.isInteger(id)) {
+      throw new Error(`Invalid song ID: '${idSong}' is not a number`);
+    }
     const song = await getSongById(idSong);
 
     if (!song) {

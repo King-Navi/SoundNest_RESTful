@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {registerUser, editUser, editUserPasswordController} = require("../controllers/user.controller");
+const {registerUser, editUser, editUserPasswordController, getAditionalInfoUserController} = require("../controllers/user.controller");
 const compareCodeMiddleware = require("../middlewares/compareCode.middleware");
 const authorization = require("../middlewares/auth.middleware");
 const { validateEditUser , validateNewUser, validateEditUserPassword} = require("../middlewares/validateEditUser.middleware");
@@ -145,6 +145,85 @@ router.patch(
   authorization,
   validateEditUserPassword,
   editUserPasswordController,
+);
+
+router.get(
+  /*
+    #swagger.path = '/api/user/get/aditionalInfo'
+    #swagger.tags = ['Users']
+    #swagger.summary = 'Retrieve additional user information'
+    #swagger.description = `
+    Returns additional information for the authenticated user.
+    **Structure of 'info':**
+    - The \`info\` object can contain any number of key-value pairs.
+    - Each key is a string, and each value must be an **array of strings**.
+    - This allows users to store flexible, categorized metadata (e.g., genres, interests, platforms).
+
+    **Warning:**
+    - The server does not validate the keys inside \`info\`; only the value format is expected (array of strings).
+    - Ensure consistent naming on the client side to avoid data fragmentation (e.g., avoid using both 'Genres' and 'genres').
+
+    **Example:**
+    {
+      "info": {
+        "genres": ["rock", "electronic"],
+        "platforms": ["Instagram", "Spotify"],
+        "interests": ["coding", "DJing"]
+      }
+    }
+    `
+    #swagger.parameters['Authorization'] = {
+      in: 'header',
+      required: true,
+      type: 'string',
+      description: 'Bearer token (JWT) for user authentication'
+    }
+
+    #swagger.responses[200] = {
+      description: 'Additional information retrieved successfully',
+      schema: {
+        info: {
+          type: 'object',
+          additionalProperties: {
+            type: 'array',
+            items: {
+              type: 'string',
+              example: 'example string'
+            }
+          },
+          example: {
+            genres: ['rock', 'electronic'],
+            interests: ['coding', 'music'],
+            platforms: ['Instagram', 'Spotify']
+          }
+        }
+      }
+    }
+
+    #swagger.responses[401] = {
+      description: 'Unauthorized - missing or invalid JWT',
+      schema: {
+        message: 'No token provided'
+      }
+    }
+
+    #swagger.responses[404] = {
+      description: 'No additional information found for this user',
+      schema: {
+        error: 'No additional information found for this user.'
+      }
+    }
+
+    #swagger.responses[500] = {
+      description: 'Server error while retrieving additional information',
+      schema: {
+        error: 'Internal server error'
+      }
+    }
+  */
+  `${USER_BASIC_ROUTE}/get/aditionalInfo`,
+  authorization,
+  getAditionalInfoUserController
 );
 
 

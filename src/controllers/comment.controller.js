@@ -1,6 +1,7 @@
 const { ValidationError } = require('sequelize');
 const commentService = require('../service/comment.service');
 const { NonexistentSong } = require('../service/exceptions/exceptions');
+const {notifyOnCommentReply} = require("../service/messaging.service");
 
 async function createComment(req, res) {
   if (!req.user) {
@@ -25,7 +26,6 @@ async function createComment(req, res) {
 }
 
 async function getCommentsBySong(req, res) {
-  console.log("hOLA")
   const { song_id } = req.params;
   try {
     const comentarios = await commentService.getCommentsBySong(Number(song_id));
@@ -53,9 +53,16 @@ async function getCommentById(req, res) {
 
 async function addResponseToComment(req, res) {
   const { commentId } = req.params;
-  const { user, message } = req.body;
+  const { message } = req.body;
+  const {id , username} = req.user;
   try {
-    const respuesta = await commentService.addResponseToComment(commentId, user, message);
+    const respuesta = await commentService.addResponseToComment(commentId, username, message, id);
+    await notifyOnCommentReply({
+      commentId,
+      senderId,
+      senderName,
+      messageContent
+    });
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });

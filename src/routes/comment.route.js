@@ -75,7 +75,7 @@ router.post(
 
 router.get(
 /*
-    #swagger.path = '/api/comment/getComment/:song_id'
+    #swagger.path = '/api/comment/getComment/:song_id/song'
     #swagger.tags = ['Comments']
     #swagger.summary = 'Obtener comentarios por ID de canción'
     #swagger.parameters['song_id'] = {
@@ -100,13 +100,13 @@ router.get(
     #swagger.responses[404] = { description: 'No se encontraron comentarios' }
     #swagger.responses[500] = { description: 'Error del servidor' }
     */
-    `${COMMENT_BASIC_ROUTE}/getComment/:song_id`, 
+    `${COMMENT_BASIC_ROUTE}/getComment/:song_id/song`, 
     commentController.getCommentsBySong
 );
 
 router.get(
     /*
-    #swagger.path = '/api/comment/getComment/comment/:id'
+    #swagger.path = '/api/comment/:id/all'
     #swagger.tags = ['Comments']
     #swagger.summary = 'Obtener comentario por ID'
     #swagger.parameters['id'] = {
@@ -131,7 +131,7 @@ router.get(
     #swagger.responses[404] = { description: 'Comentario no encontrado' }
     #swagger.responses[500] = { description: 'Error del servidor' }
     */
-    '/getComment/comment/:id',
+    `${COMMENT_BASIC_ROUTE}/:id/all`,
     commentController.getCommentById
 );
 

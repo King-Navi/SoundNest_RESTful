@@ -11,8 +11,15 @@ class UserNameAlreadyExist extends HttpError {
     super(400, "User name already exists");
   }
 }
+class NonexistentAditionalInformation extends HttpError {
+  constructor() {
+    super(404, "The AditionalInformation does not exist");
+  }
+}
+
 
 module.exports = {
   EmailAlreadyExist,
-  UserNameAlreadyExist
+  UserNameAlreadyExist,
+  NonexistentAditionalInformation
 };
