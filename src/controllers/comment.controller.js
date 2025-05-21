@@ -58,10 +58,10 @@ async function addResponseToComment(req, res) {
   try {
     const respuesta = await commentService.addResponseToComment(commentId, username, message, id);
     await notifyOnCommentReply({
-      commentId,
-      senderId,
-      senderName,
-      messageContent
+      commentId:commentId,
+      senderId:id,
+      senderName:username,
+      messageContent:message
     });
     res.status(204).send();
   } catch (error) {

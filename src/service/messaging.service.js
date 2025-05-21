@@ -3,7 +3,6 @@ const {
 } = require("../repositories/visualization.repository");
 const {
   alertUsersOfEventSongVisits,
-  alertUsersOfEventCommentReply,
 } = require("../messaging/alertEvents/songVisits.producer");
 const CommentRepository = require("../repositories/ComentarioRepository.mongo.repository");
 const commentRepository = new CommentRepository();

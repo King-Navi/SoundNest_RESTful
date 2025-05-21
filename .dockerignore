@@ -40,3 +40,7 @@ out/
 .tsbuildinfo  
 .yarn/cache
 .pnp.*
+
+
+uploads/
+uploads

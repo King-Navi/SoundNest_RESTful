@@ -16,7 +16,6 @@ const { Visualization } = models;
  * @returns {Promise<number[]>} Array of idSong sorted by descending plays
  */
 async function getTopSongIdsByMonth(year, month, limit = MAX_SONGS_RECOVER) {
-  console.log("Si llego aqui")
   const now = new Date();
   const y = year && !isNaN(year) ? Number(year) : now.getFullYear();
   const m =
