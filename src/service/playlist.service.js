@@ -1,10 +1,73 @@
-require('dotenv').config();
 const path = require('path');
 const PlaylistRepository = require('../repositories/playlist.mongo.repository');
 const FileManager = require('../utils/fileManager');
 const {NonexistentPlaylist} = require('./exceptions/exceptions');
 const fileManager = new FileManager('PLAYLIST_IMAGE_PATH_JS');
 const playlistRepository = new PlaylistRepository()
+const {
+  getSongsByIds
+} = require("../repositories/song.repository");
+
+
+/**
+   * Limpia la lista de canciones de una playlist eliminando aquellas
+   * que no existen o están marcadas como borradas en la base de datos SQL.
+   *
+   * @param {string} playlistId  – ID de la playlist en Mongo
+   * @returns {Promise<number[]>}  – Array con los song_id que fueron removidos
+   *
+   * @throws {NonexistentPlaylist}  Si la playlist no existe
+   */
+  async function cleanPlaylistSongs(playlistId) {
+    const playlist = await playlistRepository.getPlaylistById(playlistId);
+    if (!playlist) {
+      throw new NonexistentPlaylist(`Playlist with id ${playlistId} not found`);
+    }
+    const originalEntries = playlist.songs || [];
+    const originalIds = originalEntries.map(e => e.song_id);
+
+    if (originalIds.length === 0) {
+      return [];
+    }
+    const existingSongs = await getSongsByIds(originalIds);
+    const existingIds   = existingSongs.map(s => s.idSong);
+    const removedIds = originalIds.filter(id => !existingIds.includes(id));
+    const cleanedEntries = originalEntries.filter(e =>
+      existingIds.includes(e.song_id)
+    );
+    await playlistRepository.updatePlaylistById(playlistId, { songs: cleanedEntries });
+    return removedIds;
+  }
+
+
+ /**
+   * Edits an existing playlist.
+   *
+   * @param {string} playlistId   - ID of the playlist to edit.
+   * @param {number} userId       - ID of the user making the request.
+   * @param {Object} payload      - Fields to update: { playlist_name, description, image_path }.
+   * @returns {Object}            - The updated playlist.
+   *
+   * @throws {NonexistentPlaylist} If the playlist does not exist.
+   * @throws {Error}               If the user is not the creator (access denied).
+   */
+  async function editPlaylistService(playlistId, userId, payload) {
+    const playlist = await playlistRepository.getPlaylistById(playlistId);
+    if (!playlist) {
+      throw new NonexistentPlaylist(`Playlist con id ${playlistId} no encontrada`);
+    }
+    if (playlist.creator_id !== userId) {
+      throw new Error('Acceso denegado: no eres el propietario de esta playlist');
+    }
+    const updateData = {};
+    if (payload.playlist_name  !== undefined) updateData.playlist_name  = payload.playlist_name;
+    if (payload.description    !== undefined) updateData.description    = payload.description;
+    const updated = await playlistRepository.updatePlaylistById(playlistId, updateData);
+    if (!updated) {
+      throw new NonexistentPlaylist(`No se pudo actualizar la playlist con id ${playlistId}`);
+    }
+    return updated;
+  }
 
 async function getPlaylistService(iduser) {
   const playlists = await playlistRepository.getPlaylistsByCreatorId(iduser);
@@ -69,21 +132,14 @@ const getImageUrl = (protocol, host, filename) => {
   return `${protocol}://${host}/images/playlists/${filename}`;
 };
 
-const getPlaylistByIdPlaylist = (idPlaylist)=>{
-
-}
-
-const getPlaylistsByIdUser = (idPlaylist)=>{
-
-}
 
 module.exports = {
   deletePlaylistService,
   createPlaylistService,
   getImageUrl,
-  getPlaylistByIdPlaylist,
-  getPlaylistsByIdUser,
   addSongToPlaylistService,
   removeSongToPlaylistService,
-  getPlaylistService
+  getPlaylistService,
+  editPlaylistService,
+  cleanPlaylistSongs,
 };

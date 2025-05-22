@@ -1,5 +1,5 @@
 const fs = require("fs/promises");
-const { NotFoundError } = require("../repositories/exceptions/song.exceptions");
+const { NotFoundError, BadRequestError } = require("../repositories/exceptions/song.exceptions");
 const {
   getGenres,
   getExtensions,
@@ -11,8 +11,39 @@ const {
   getSongOfUser,
   getLastUserSong,
   deleteSongService,
+  getListSongsByIdsService,
+  updateDescriptionSongService,
 } = require("../service/song.service");
 const { updateSongImage } = require("../service/songImage.service");
+
+async function updateDescriptionSong(req, res) {
+  try {
+    const { id } = req.user;
+    const { idsong } = req.params;
+    const { description } = req.body;
+    console.log(id)
+
+    await updateDescriptionSongService(idsong, id, description);
+    return res.status(204).send();
+  } catch (error) {
+    if (error instanceof BadRequestError) {
+      return res.status(400).json({ error: error.message });
+    }
+    console.error("[song.controller.js] updateDescriptionSong:", error);
+    return res.status(500).json({ error: err.message });
+  }
+}
+
+async function getListOfSongByIds(req, res) {
+  try {
+    const { songIds } = req.body;
+    const songs = await getListSongsByIdsService(songIds);
+    return res.status(200).json(songs);
+  } catch (error) {
+    console.error("[song.controller.js] getListOfSongByIds:", error);
+    return res.status(500).json({ error: err.message });
+  }
+}
 
 async function deleteSongController(req, res) {
   try {
@@ -20,14 +51,13 @@ async function deleteSongController(req, res) {
     const result = await deleteSongService(idSong);
     return res.status(200).json(result);
   } catch (err) {
-    console.error('[deleteSongController]', err);
-    if (err.message.includes('does not exist')) {
+    console.error("[deleteSongController]", err);
+    if (err.message.includes("does not exist")) {
       return res.status(404).json({ error: err.message });
     }
     return res.status(500).json({ error: err.message });
   }
 }
-
 
 async function updateImageSongController(req, res) {
   try {
@@ -208,5 +238,7 @@ module.exports = {
   getSongOfUserController,
   getLastUserSongController,
   updateImageSongController,
-  deleteSongController
+  updateDescriptionSong,
+  deleteSongController,
+  getListOfSongByIds,
 };

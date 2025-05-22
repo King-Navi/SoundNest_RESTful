@@ -5,7 +5,7 @@ const AdditionalInfo = require("../modelsMongo/AdditionalInfo");
  * If the user already has additional info, it will be overwritten.
  *
  * @param {Number} userId - The ID of the user.
- * @param {Object} info - The additional information to save.
+ * @param {String} info - The additional information to save.
  * @returns {Promise<Object>} - The saved or updated document.
  */
 async function saveAdditionalInformation(userId, info) {

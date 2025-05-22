@@ -1,7 +1,7 @@
 const { getAllGenres } = require("../repositories/songGenre.repository");
 const { getAllExtension } = require("../repositories/songExtension.repository");
 const FileManager = require("../utils/fileManager");
-const fileManager = new FileManager('SONGS_IMAGE_PATH_JS');
+const fileManager = new FileManager("SONGS_IMAGE_PATH_JS");
 const {
   getSongsByFilters,
   verifySongExists,
@@ -14,27 +14,82 @@ const {
   getSongsByUserId,
   getMostRecentSongByUser,
   updateSongSetDeleted,
+  getByIdWithDetails,
 } = require("../repositories/song.repository");
 const {
   getVisualizationsBySongId,
   getTopSongIdsByMonth,
 } = require("../repositories/visualization.repository");
-const { getBySongPhotoId, deleteSongPhotoBySongId} = require("../repositories/songPhoto.repository");
-const { NotFoundError } = require("../repositories/exceptions/song.exceptions");
+const {
+  getBySongPhotoId,
+  deleteSongPhotoBySongId,
+} = require("../repositories/songPhoto.repository");
+const { NotFoundError, BadRequestError } = require("../repositories/exceptions/song.exceptions");
 const SongDescriptionRepository = require("../repositories/songDescription.mongo.reposiroty");
 const songDescriptionRepo = new SongDescriptionRepository();
-const {publishDeleteSong } = require("../messaging/deleteSong.producer")
+const { publishDeleteSong } = require("../messaging/deleteSong.producer");
+
+/**
+ * Creates or updates only the description of a song.
+ * Validates that songId and userId are positive integers and that description is a non-empty string.
+ *
+ * @param {number|string} songId
+ * @param {number|string} userId
+ * @param {string} description
+ * @returns {Promise<Object>} The updated or newly created description document
+ * @throws {BadRequestError} If any of the parameters is invalid
+ */
+async function updateDescriptionSongService(songId, userId, description) {
+  const idSong = Number(songId);
+  const idUser = Number(userId);
+  console.log(idUser)
+  if (!Number.isInteger(idSong) || idSong <= 0) {
+    throw new BadRequestError('Invalid songId: must be a positive integer');
+  }
+  if (!Number.isInteger(idUser) || idUser <= 0) {
+    throw new BadRequestError('Invalid userId: must be a positive integer');
+  }
+  if (typeof description !== 'string' || description.trim().length === 0) {
+    throw new BadRequestError('Invalid description: must be a non-empty string');
+  }
+  let updated = await songDescriptionRepo.updateDescriptionBySongId(
+    idSong,
+    description.trim()
+  );
+  if (!updated) {
+    updated = await songDescriptionRepo.create({
+      songs_id:   idSong,
+      author_id:  idUser,
+      description: description.trim()
+    });
+  }
+  return updated;
+}
+
+/**
+ * Retrieves multiple songs by their IDs, excluding those deleted.
+ *
+ * @param {number[]} songIds – Array of song IDs.
+ * @returns {Promise<Array>} – List of Songs.
+ */
+async function getListSongsByIdsService(songIds) {
+  if (!Array.isArray(songIds) || songIds.length === 0) {
+    return [];
+  }
+  const rawSongList = await getSongsByIds(songIds);
+  return formatSongList(rawSongList);
+}
 
 /**
  * Deletes all files associated with a song and its related photo.
- * 
+ *
  * - Marks the song as logically deleted by setting its `isDeleted` flag to `true`.
  * - Deletes the song's description if it exists.
  * - Deletes the associated photo both from storage and the database.
  * - Sends a gRPC request to remove the audio file remotely.
- * 
+ *
  * This function does **not** delete any visualization linked to the song.
- * 
+ *
  * @param {string} idSong - The unique identifier of the song to delete.
  * @returns {Promise<Object>} A message confirming the song was successfully deleted.
  * @throws {Error} If the song does not exist, or if any step in the deletion process fails.
@@ -66,24 +121,28 @@ async function deleteSongService(idSong) {
   }
 
   await updateSongSetDeleted(idSong);
-  
+
   return { message: `Canción ${idSong} eliminada correctamente` };
 }
 
-
-
-async function searchSong(songName, artistName, idGenre, limitSearch, offsetSearch) {
+async function searchSong(
+  songName,
+  artistName,
+  idGenre,
+  limitSearch,
+  offsetSearch
+) {
   try {
     const filters = {
       songName,
       artistName,
-      idSongGenre: idGenre
+      idSongGenre: idGenre,
     };
     pagination = {
-      limit : limitSearch,
-      offset : offsetSearch,
-    }
-    let queryResult= await getSongsByFilters(filters);
+      limit: limitSearch,
+      offset: offsetSearch,
+    };
+    let queryResult = await getSongsByFilters(filters);
     return await formatSongList(queryResult);
   } catch (error) {
     throw error;
@@ -188,7 +247,7 @@ async function getExtensions() {
 async function getSongOfUser(userId) {
   try {
     const rawSongs = await getSongsByUserId(userId);
-    return formatSongList(rawSongs); 
+    return formatSongList(rawSongs);
   } catch (error) {
     throw error;
   }
@@ -208,33 +267,37 @@ async function getLastUserSong(userId) {
  * @param {Object} song Sequelize instance
  * @returns {Promise<Object>} formatted song object
  */
-async function formatSong(song) {
-  if (!song) return null;
+async function formatSong(songInstance) {
+  if (!songInstance) return null;
+  let song = songInstance;
+  if (!songInstance.idAppUser_AppUser) {
+    song = await getByIdWithDetails(songInstance.idSong);
+    if (!song) return null;
+  }
 
-  const songData = song.toJSON();
-  const visualizations = await getVisualizationsBySongId(songData.idSong);
-  const photo = await getBySongPhotoId(songData.idSong);
+  const data = song.toJSON();
+  const photo = data.SongPhotos?.[0];
   const pathImageUrl = photo
     ? `/images/songs/${photo.fileName}.${photo.extension}`
     : null;
 
+  const visualizations = await getVisualizationsBySongId(data.idSong);
   let description = "N/A";
   try {
-    const descDoc = await songDescriptionRepo.getBySongId(songData.idSong);
-    if (descDoc && descDoc.description) {
-      description = descDoc.description;
-    }
-  } catch (error) { }
+    const descDoc = await songDescriptionRepo.getBySongId(data.idSong);
+    if (descDoc?.description) description = descDoc.description;
+  } catch (_) {}
+
   return {
-    idSong: songData.idSong,
-    songName: songData.songName,
-    fileName: songData.fileName,
-    durationSeconds: songData.durationSeconds,
-    releaseDate: songData.releaseDate,
-    isDeleted: songData.isDeleted,
-    idSongGenre: songData.idSongGenre,
-    idSongExtension: songData.idSongExtension,
-    userName: songData.idAppUser_AppUser?.nameUser || null,
+    idSong: data.idSong,
+    songName: data.songName,
+    fileName: data.fileName,
+    durationSeconds: data.durationSeconds,
+    releaseDate: data.releaseDate,
+    isDeleted: data.isDeleted,
+    idSongGenre: data.idSongGenre,
+    idSongExtension: data.idSongExtension,
+    userName: data.idAppUser_AppUser?.nameUser || null,
     description,
     pathImageUrl,
     visualizations,
@@ -252,8 +315,6 @@ async function formatSongList(songs) {
   return results;
 }
 
-
-
 module.exports = {
   getSong,
   getGenres,
@@ -265,4 +326,6 @@ module.exports = {
   getSongOfUser,
   getLastUserSong,
   deleteSongService,
+  getListSongsByIdsService,
+  updateDescriptionSongService,
 };

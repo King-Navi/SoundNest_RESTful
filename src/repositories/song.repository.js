@@ -2,10 +2,34 @@ const sequelize = require("../config/sequelize");
 const initModels = require("../models/init-models");
 const { Op, fn, col, literal } = require("sequelize");
 const models = initModels(sequelize);
-const { Song, Visualization, AppUser, SongGenre } = models;
+const { Song, Visualization, AppUser, SongPhoto } = models;
 const {NotFoundError} = require("./exceptions/song.exceptions")
 
 const MAX_SONGS_RECOVER = 40;
+
+
+async function getByIdWithDetails(idSong) {
+  return await Song.findByPk(idSong, {
+    include: [
+      {
+        model: AppUser,
+        as: "idAppUser_AppUser",
+        attributes: ["nameUser"],
+      },
+      {
+        model: SongPhoto,
+        as: "SongPhotos",
+        attributes: ["fileName", "extension"],
+      },
+      {
+        model: Visualization,
+        as: "Visualizations",
+        attributes: ["playCount", "period"],
+      },
+    ],
+  });
+}
+
 
 /**
  * Retrieves a list of songs based on optional filters and pagination.
@@ -298,5 +322,6 @@ module.exports = {
   getSongById,
   getSongsByUserId,
   getMostRecentSongByUser,
-  updateSongSetDeleted
+  updateSongSetDeleted,
+  getByIdWithDetails
 };

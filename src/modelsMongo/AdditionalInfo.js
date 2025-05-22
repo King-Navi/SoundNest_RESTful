@@ -7,8 +7,9 @@ const AdditionalInfoSchema = new mongoose.Schema({
     unique: true,
   },
   info: {
-    type: mongoose.Schema.Types.Mixed,
+    type: String,
     required: true,
+    trim: true,
   },
 });
 

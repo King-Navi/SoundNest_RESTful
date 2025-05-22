@@ -27,6 +27,12 @@ const playlistImagePath = process.env.PLAYLIST_IMAGE_PATH_JS;
 const songImagePath = process.env.SONGS_IMAGE_PATH_JS;
 
 app.use(express.json());
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ error: 'Invalid JSON payload' });
+  }
+  next(err);
+});
 app.use(authRoutes);
 app.use(commentRoutes);
 app.use("/api/notifications", notificationRoutes);
@@ -44,7 +50,7 @@ app.use((err, req, res, next) => {
   ) {
     return res.status(400).json({ error: err.message });
   }
-  console.error(error);
+  console.error(err);
   return res.status(500).json({ error: "Unexpected CRITICAL server error" });
 });
 

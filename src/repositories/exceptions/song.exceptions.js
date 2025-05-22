@@ -14,7 +14,17 @@ class DeletedError extends Error {
   }
 }
 
+class BadRequestError  extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'Error validating';
+    this.statusCode = 400;
+  }
+}
+
+
 module.exports = {
   NotFoundError,
   DeletedError,
+  BadRequestError,
 };

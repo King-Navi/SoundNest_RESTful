@@ -1610,6 +1610,266 @@
         }
       }
     },
+    "/api/songs/edit/description/:idsong": {
+      "patch": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Edit song description",
+        "description": "Creates or updates the description for a song. Only the owner of the song can perform this action.",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "idsong",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the song to update description for",
+            "example": 42
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "object"
+                },
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "New description text for the song"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "An awesome new description for this track."
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": {
+                  "type": "array",
+                  "example": [
+                    "description"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/songs/list/get": {
+      "get": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Get a list of songs by IDs",
+        "description": "Returns detailed information for the given array of song IDs. Only non-deleted songs are returned.",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "object"
+                },
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "songIds": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "array"
+                        },
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "example": "integer"
+                            }
+                          }
+                        },
+                        "example": {
+                          "type": "array",
+                          "example": [
+                            4,
+                            5,
+                            6
+                          ],
+                          "items": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": {
+                  "type": "array",
+                  "example": [
+                    "songIds"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of song objects successfully returned",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "idSong": {
+                    "type": "number",
+                    "example": 5
+                  },
+                  "songName": {
+                    "type": "string",
+                    "example": "amazed by ABCD"
+                  },
+                  "fileName": {
+                    "type": "string",
+                    "example": "s5"
+                  },
+                  "durationSeconds": {
+                    "type": "number",
+                    "example": 244
+                  },
+                  "releaseDate": {
+                    "type": "string",
+                    "example": "2025-05-21T18:58:36.000Z"
+                  },
+                  "isDeleted": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "idSongGenre": {
+                    "type": "number",
+                    "example": 2
+                  },
+                  "idSongExtension": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "userName": {
+                    "type": "string",
+                    "example": "1"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "N/A"
+                  },
+                  "pathImageUrl": {},
+                  "visualizations": {
+                    "type": "array",
+                    "example": [],
+                    "items": {}
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request – invalid or missing songIds",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "The field songIds is required and must be an array of positive integers"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Error trying to get song list"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/songs/:idsong/delete": {
       "delete": {
         "tags": [
@@ -2733,7 +2993,386 @@
         }
       }
     },
-    "/api/playlist/{iduser}/user": {
+    "/api/playlist/list/:idPlaylist/clean": {
+      "patch": {
+        "tags": [
+          "Playlists"
+        ],
+        "summary": "Clean deleted songs from playlist",
+        "description": "Removes songs marked as deleted from the playlist and returns the list of removed song IDs.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "Bearer JWT token"
+          },
+          {
+            "name": "idPlaylist",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the playlist to clean",
+            "example": "682e2b4697981929a82b9ce6"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of removed song IDs successfully returned",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "array"
+                },
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "integer"
+                    }
+                  }
+                },
+                "example": {
+                  "type": "array",
+                  "example": [
+                    3,
+                    7,
+                    15
+                  ],
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized – missing or invalid token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "No token provided"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden – user is not the owner of the playlist",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Access denied"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "Playlist not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Playlist with id 682e2b4697981929a82b9ce6 not found"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Error trying to clean the playlist"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/playlist/edit/:idPlaylist": {
+      "patch": {
+        "tags": [
+          "Playlists"
+        ],
+        "summary": "Edit a playlist",
+        "description": "Edits the name and description of an existing playlist. Only the playlist owner can perform this action.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "idPlaylist",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the playlist to edit",
+            "example": "682e2b4697981929a82b9ce6",
+            "in": "query"
+          },
+          {
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "object"
+                },
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "playlist_name": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "New playlist name"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "My Updated Playlist Title"
+                        }
+                      }
+                    },
+                    "description": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "New playlist description"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "A fresh new description for my playlist"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "in": "query"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "playlist_name": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Playlist successfully updated",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "example": "682e2b4697981929a82b9ce6"
+                },
+                "creator_id": {
+                  "type": "number",
+                  "example": 2
+                },
+                "playlist_name": {
+                  "type": "string",
+                  "example": "My Updated Playlist Title"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "A fresh new description for my playlist"
+                },
+                "image_path": {
+                  "type": "string",
+                  "example": "31c3e318-7f63-47eb-b08c-61407400089b.png"
+                },
+                "songs": {
+                  "type": "array",
+                  "example": [],
+                  "items": {}
+                },
+                "createdAt": {
+                  "type": "string",
+                  "example": "2025-05-21T19:36:38.676Z"
+                },
+                "__v": {
+                  "type": "number",
+                  "example": 0
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/playlist/one/:idPlaylist": {
+      "get": {
+        "tags": [
+          "Playlists"
+        ],
+        "summary": "Get a single playlist by its ID",
+        "description": "Returns the playlist document for the given MongoDB ObjectId. Requires the playlist to exist.",
+        "parameters": [
+          {
+            "name": "idPlaylist",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the playlist to retrieve",
+            "example": "682e2b4697981929a82b9ce6"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Playlist successfully retrieved",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "example": "682e2b4697981929a82b9ce6"
+                },
+                "creator_id": {
+                  "type": "number",
+                  "example": 2
+                },
+                "playlist_name": {
+                  "type": "string",
+                  "example": "playlist 1"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "cumbias"
+                },
+                "image_path": {
+                  "type": "string",
+                  "example": "31c3e318-7f63-47eb-b08c-61407400089b.png"
+                },
+                "songs": {
+                  "type": "array",
+                  "example": [],
+                  "items": {}
+                },
+                "createdAt": {
+                  "type": "string",
+                  "example": "2025-05-21T19:36:38.676Z"
+                },
+                "__v": {
+                  "type": "number",
+                  "example": 0
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "Playlist not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Playlist with id 682e2b4697981929a82b9ce6 not found"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Error trying to get the playlist"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/playlist/:iduser/user": {
       "get": {
         "tags": [
           "Playlists"
@@ -3380,6 +4019,9 @@
     },
     "/api/visit/:idsong/increment": {
       "post": {
+        "tags": [
+          "Visualizations"
+        ],
         "summary": "Increment or create monthly play count",
         "description": "Increments the play count for the current month. If no record exists for that month, creates it with playCount=1.",
         "parameters": [
@@ -3411,6 +4053,9 @@
     },
     "/api/visit/top/:year/:month": {
       "get": {
+        "tags": [
+          "Visualizations"
+        ],
         "summary": "Get top song IDs by plays in a month",
         "description": "Returns an array of song IDs ordered by descending play count for the given month/year.",
         "parameters": [
@@ -3475,6 +4120,9 @@
     },
     "/api/visit/:idsong/:year/:month": {
       "get": {
+        "tags": [
+          "Visualizations"
+        ],
         "summary": "Get visualization record for a song in a month",
         "description": "Returns the visualization object for a given song ID and month/year.",
         "parameters": [
@@ -3584,6 +4232,9 @@
     },
     "/api/visit/:idsong": {
       "get": {
+        "tags": [
+          "Visualizations"
+        ],
         "summary": "List all visualizations for a song",
         "description": "Returns an array of all visualization records for the specified song, ordered by period.",
         "parameters": [

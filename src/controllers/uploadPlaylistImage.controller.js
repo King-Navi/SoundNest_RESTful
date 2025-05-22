@@ -4,8 +4,71 @@ const {
   addSongToPlaylistService,
   removeSongToPlaylistService,
   getPlaylistService,
+  editPlaylistService,
+  cleanPlaylistSongs,
 } = require("../service/playlist.service");
 const {NonexistentPlaylist, SongAlreadyInPlaylist, SongNotInPlaylist} =require('../service/exceptions/exceptions'); 
+
+async function cleanListSongController(req, res) {
+  const { idPlaylist } = req.params;
+  try {
+    const removedIds = await cleanPlaylistSongs(idPlaylist);
+    return res.status(200).json({ removedIds });
+  } catch (err) {
+    if (err instanceof NonexistentPlaylist) {
+      return res.status(404).json({ error: err.message });
+    }
+    console.error('[cleanListSongController] Error:', err);
+    return res.status(500).json({ error: 'Error trying to clean the playlist' });
+  }
+}
+
+async function editPlaylistController(req, res) {
+  const { idPlaylist } = req.params;
+  const userId = req.user.id;
+  const allowed = ['playlist_name', 'description'];
+  const received = Object.keys(req.body);
+  const invalid = received.filter(key => !allowed.includes(key));
+  if (invalid.length > 0) {
+    return res
+      .status(400)
+      .json({ error: `Campos no permitidos: ${invalid.join(', ')}` });
+  }
+  if (!received.length) {
+    return res
+      .status(400)
+      .json({ error: 'Debe incluir al menos playlist_name o description' });
+  }
+  const payload = {
+    playlist_name: req.body.playlist_name,
+    description:   req.body.description,
+  };
+
+  try {
+    const updated = await editPlaylistService(
+      idPlaylist,
+      userId,
+      payload
+    );
+    return res.json(updated);
+
+  } catch (err) {
+    if (err instanceof NonexistentPlaylist) {
+      return res.status(404).json({ error: err.message });
+    }
+
+    console.error('[editPlaylistController] Error:', err);
+    return res.status(500).json({ error: 'Error al editar la playlist' });
+  }
+}
+
+async function getPlaylistByIdControlller(req, res) {
+  try {
+    return res.status(200).json(req.playlist);
+  } catch (error) {
+    res.status(500).json({ error: "Error trying to get the playlsit"});
+  }
+}
 
 async function fecthPlaylistController(req, res) {
   try {
@@ -114,5 +177,8 @@ module.exports = {
   deletePlaylistController,
   addSongToPlaylistController,
   removeSongToPlaylistController,
-  fecthPlaylistController
+  fecthPlaylistController,
+  getPlaylistByIdControlller,
+  editPlaylistController,
+  cleanListSongController
 };

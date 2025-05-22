@@ -10,10 +10,17 @@ class SongDescriptionRepository {
     return await SongDescription.findOne({ songs_id });
   }
 
-  async updateBySongId(songs_id, updatedData) {
+  /**
+   * Updates only the 'description' field for the given song.
+   *
+   * @param {number} songs_id       – ID de la canción a la que pertenece la descripción.
+   * @param {string} newDescription – La nueva descripción.
+   * @returns {Promise<Object|null>} – El documento actualizado, o null si no existía.
+   */
+  async updateDescriptionBySongId(songs_id, newDescription) {
     return await SongDescription.findOneAndUpdate(
       { songs_id },
-      { $set: updatedData },
+      { $set: { description: newDescription } },
       { new: true }
     );
   }

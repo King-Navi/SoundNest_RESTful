@@ -7,21 +7,172 @@ const {
   addSongToPlaylistController,
   removeSongToPlaylistController,
   fecthPlaylistController,
+  getPlaylistByIdControlller,
+  editPlaylistController,
+  cleanListSongController
 } = require("../controllers/uploadPlaylistImage.controller");
 const authorization = require("../middlewares/auth.middleware");
 const validateFileType = require("../middlewares/validateFileType");
 const validateNewPlaylist = require("../middlewares/validatePlaylist.middleware");
 const {validatePlaylistOwnership} = require("../middlewares/validatePlaylistOwnership.middleware");
-
+const existPlaylist = require("../middlewares/existPlaylist.middleware");
 const validateIdSong = require("../middlewares/validateSongId.middleware")
-/*
-PATH editar nombre y titulo
-*/
+
+
 const PLAYLIST_BASIC_ROUTE = "/api/playlist";
+
+router.patch(
+  /*
+ #swagger.path = '/api/playlist/list/:idPlaylist/clean'
+ #swagger.tags = ['Playlists']
+ #swagger.summary = 'Clean deleted songs from playlist'
+ #swagger.description = 'Removes songs marked as deleted from the playlist and returns the list of removed song IDs.'
+ #swagger.parameters['Authorization'] = {
+   in: 'header',
+   name: 'Authorization',
+   required: true,
+   type: 'string',
+   description: 'Bearer JWT token'
+ }
+ #swagger.parameters['idPlaylist'] = {
+   in: 'path',
+   name: 'idPlaylist',
+   required: true,
+   type: 'string',
+   description: 'MongoDB ObjectId of the playlist to clean',
+   example: '682e2b4697981929a82b9ce6'
+ }
+ #swagger.responses[200] = {
+   description: 'Array of removed song IDs successfully returned',
+   schema: {
+     type: 'array',
+     items: { type: 'integer' },
+     example: [3, 7, 15]
+   }
+ }
+ #swagger.responses[401] = {
+   description: 'Unauthorized – missing or invalid token',
+   schema: { message: 'No token provided' }
+ }
+ #swagger.responses[403] = {
+   description: 'Forbidden – user is not the owner of the playlist',
+   schema: { error: 'Access denied' }
+ }
+ #swagger.responses[404] = {
+   description: 'Playlist not found',
+   schema: { error: 'Playlist with id 682e2b4697981929a82b9ce6 not found' }
+ }
+ #swagger.responses[500] = {
+   description: 'Internal server error',
+   schema: { error: 'Error trying to clean the playlist' }
+ }
+ */
+  `${PLAYLIST_BASIC_ROUTE}/list/:idPlaylist/clean`,
+  authorization,
+  validatePlaylistOwnership,
+  cleanListSongController
+);
+
+router.patch(
+/*
+   #swagger.path = '/api/playlist/edit/:idPlaylist'
+   #swagger.tags = ['Playlists']
+   #swagger.summary = 'Edit a playlist'
+   #swagger.description = 'Edits the name and description of an existing playlist. Only the playlist owner can perform this action.'
+ 
+   #swagger.parameters['idPlaylist'] = {
+     required: true,
+     type: 'string',
+     description: 'MongoDB ObjectId of the playlist to edit',
+     example: '682e2b4697981929a82b9ce6'
+   }
+   #swagger.parameters['body'] = {
+     required: true,
+     schema: {
+       type: 'object',
+       properties: {
+         playlist_name: {
+           type: 'string',
+           description: 'New playlist name',
+           example: 'My Updated Playlist Title'
+         },
+         description: {
+           type: 'string',
+           description: 'New playlist description',
+           example: 'A fresh new description for my playlist'
+         }
+       }
+     }
+   }
+   #swagger.responses[200] = {
+     description: 'Playlist successfully updated',
+     schema: {
+       _id:           '682e2b4697981929a82b9ce6',
+       creator_id:    2,
+       playlist_name: 'My Updated Playlist Title',
+       description:   'A fresh new description for my playlist',
+       image_path:    '31c3e318-7f63-47eb-b08c-61407400089b.png',
+       songs:         [],
+       createdAt:     '2025-05-21T19:36:38.676Z',
+       __v:           0
+     }
+   }
+ */
+  `${PLAYLIST_BASIC_ROUTE}/edit/:idPlaylist`,
+  authorization,
+  existPlaylist,
+  validatePlaylistOwnership,
+  editPlaylistController
+);
+
+router.get(
+  /**
+  #swagger.path = '/api/playlist/one/:idPlaylist'
+  #swagger.tags = ['Playlists']
+  #swagger.summary = 'Get a single playlist by its ID'
+  #swagger.description = 'Returns the playlist document for the given MongoDB ObjectId. Requires the playlist to exist.'
+  
+  #swagger.parameters['idPlaylist'] = {
+    in: 'path',
+    name: 'idPlaylist',
+    required: true,
+    type: 'string',
+    description: 'MongoDB ObjectId of the playlist to retrieve',
+    example: '682e2b4697981929a82b9ce6'
+  }
+
+  #swagger.responses[200] = {
+    description: 'Playlist successfully retrieved',
+    schema: {
+      _id: '682e2b4697981929a82b9ce6',
+      creator_id: 2,
+      playlist_name: 'playlist 1',
+      description: 'cumbias',
+      image_path: '31c3e318-7f63-47eb-b08c-61407400089b.png',
+      songs: [],
+      createdAt: '2025-05-21T19:36:38.676Z',
+      __v: 0
+    }
+  }
+
+  #swagger.responses[404] = {
+    description: 'Playlist not found',
+    schema: { error: 'Playlist with id 682e2b4697981929a82b9ce6 not found' }
+  }
+
+  #swagger.responses[500] = {
+    description: 'Internal server error',
+    schema: { error: 'Error trying to get the playlist' }
+  }
+*/
+  `${PLAYLIST_BASIC_ROUTE}/one/:idPlaylist`,
+  existPlaylist,
+  getPlaylistByIdControlller
+);
 
 router.get(
    /*
-    #swagger.path = '/api/playlist/{iduser}/user'
+    #swagger.path = '/api/playlist/:iduser/user'
     #swagger.tags = ['Playlists']
     #swagger.summary = 'Get all playlists by user ID'
     #swagger.description = 'Returns all playlists created by the specified user. Each playlist includes its metadata and the list of songs added.'

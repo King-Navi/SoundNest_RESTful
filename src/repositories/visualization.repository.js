@@ -23,7 +23,9 @@ async function getTopSongIdsByMonth(year, month, limit = MAX_SONGS_RECOVER) {
       ? Number(month)
       : now.getMonth() + 1;
   const parsedLimit = Number(limit);
-  const safeLimit = isNaN(parsedLimit) ? MAX_SONGS_RECOVER : Math.min(parsedLimit, MAX_POPULAR_SONGS);
+  const safeLimit = isNaN(parsedLimit)
+    ? MAX_SONGS_RECOVER
+    : Math.min(parsedLimit, MAX_POPULAR_SONGS);
 
   const startDate = new Date(y, m - 1, 1);
   const endDate = new Date(y, m, 1);
@@ -147,7 +149,6 @@ async function getBySongAndPeriodMonthYear(idSong, month, year) {
     },
   });
 }
-
 
 module.exports = {
   getTopSongIdsByMonth,

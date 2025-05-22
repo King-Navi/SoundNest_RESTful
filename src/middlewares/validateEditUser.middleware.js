@@ -13,7 +13,7 @@ const editPasswordUserSchema = Joi.object({
 const editUserSchema = Joi.object({
   nameUser: Joi.string().max(100).optional(),
   email: Joi.string().email().optional(),
-  additionalInformation: Joi.object().unknown(true).optional(),
+  additionalInformation: Joi.string().optional(),
 }).min(1);
 
 const newUserSchema = Joi.object({
@@ -27,7 +27,7 @@ const newUserSchema = Joi.object({
       .alphanum()
       .min(2)
       .max(20),
-    additionalInformation: Joi.object().unknown(true).optional(),
+    additionalInformation: Joi.string().optional(),
   });
 
 function validateEditUserPassword(req, res, next) {

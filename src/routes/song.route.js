@@ -10,7 +10,9 @@ const {
   getSongOfUserController,
   getLastUserSongController,
   updateImageSongController,
+  updateDescriptionSong,
   deleteSongController,
+  getListOfSongByIds
 } = require("../controllers/song.controller");
 const {
   validateSearchQuery,
@@ -19,22 +21,125 @@ const {
   validateParams,
   idParamSchema,
 } = require("../middlewares/validateIdParams.middleware");
+const {validateListOfSongsId} = require("../middlewares/validateListOfSongsIds.middleware")
 const autoriztion = require("../middlewares/auth.middleware");
 const validateFileType = require("../middlewares/validateFileType");
 const validateSongId = require("../middlewares/validateSongId.middleware");
 const validateSongOwnership = require("../middlewares/validateSongOwnership.middleware");
 const upload = require("../middlewares/uploadSongImage.middleware");
 const router = express.Router();
-/*
-TODO:
-RECUPERAR LISTA DE CANCIONES
 
-
-EDITAR DESCRIPCION SONG
-RECUPERAR DESCRIPCION SONG
-EN GRPC FALTA descripcion en el modelo songs
-*/
 const SONG_BASIC_ROUTE = "/api/songs";
+
+router.patch(
+  /*
+ #swagger.path = '/api/songs/edit/description/:idsong'
+ #swagger.tags = ['Songs']
+ #swagger.summary = 'Edit song description'
+ #swagger.description = 'Creates or updates the description for a song. Only the owner of the song can perform this action.'
+ #swagger.security = [{ bearerAuth: [] }]
+ #swagger.parameters['idsong'] = {
+   in: 'path',
+   name: 'idsong',
+   required: true,
+   type: 'integer',
+   description: 'ID of the song to update description for',
+   example: 42
+ }
+ #swagger.consumes = ['application/json']
+ #swagger.parameters['body'] = {
+   in: 'body',
+   name: 'body',
+   required: true,
+   schema: {
+     type: 'object',
+     properties: {
+       description: {
+         type: 'string',
+         description: 'New description text for the song',
+         example: 'An awesome new description for this track.'
+       }
+     },
+     required: ['description']
+   }
+ }
+ */
+  `${SONG_BASIC_ROUTE}/edit/description/:idsong`,
+  autoriztion,
+  validateSongId,
+  validateSongOwnership,
+  updateDescriptionSong
+);
+
+router.get(
+  /*
+ #swagger.path = '/api/songs/list/get'
+ #swagger.tags = ['Songs']
+ #swagger.summary = 'Get a list of songs by IDs'
+ #swagger.description = 'Returns detailed information for the given array of song IDs. Only non-deleted songs are returned.'
+ #swagger.consumes = ['application/json']
+ #swagger.parameters['body'] = {
+   in: 'body',
+   name: 'body',
+   required: true,
+   schema: {
+     type: 'object',
+     properties: {
+       songIds: {
+         type: 'array',
+         items: { type: 'integer' },
+         example: [4, 5, 6]
+       }
+     },
+     required: ['songIds']
+   }
+ }
+ #swagger.responses[200] = {
+   description: 'Array of song objects successfully returned',
+   schema: [
+     {
+       idSong: 4,
+       songName: 'I Survive by Victoria Gano',
+       fileName: 's4',
+       durationSeconds: 194,
+       releaseDate: '2025-05-21T18:58:36.000Z',
+       isDeleted: false,
+       idSongGenre: 1,
+       idSongExtension: 1,
+       userName: '1',
+       description: 'N/A',
+       pathImageUrl: null,
+       visualizations: []
+     },
+     {
+       idSong: 5,
+       songName: 'amazed by ABCD',
+       fileName: 's5',
+       durationSeconds: 244,
+       releaseDate: '2025-05-21T18:58:36.000Z',
+       isDeleted: false,
+       idSongGenre: 2,
+       idSongExtension: 1,
+       userName: '1',
+       description: 'N/A',
+       pathImageUrl: null,
+       visualizations: []
+     }
+   ]
+ }
+ #swagger.responses[400] = {
+   description: 'Bad request – invalid or missing songIds',
+   schema: { error: 'The field songIds is required and must be an array of positive integers' }
+ }
+ #swagger.responses[500] = {
+   description: 'Internal server error',
+   schema: { error: 'Error trying to get song list' }
+ }
+ */
+  `${SONG_BASIC_ROUTE}/list/get`,
+  validateListOfSongsId,
+  getListOfSongByIds
+);
 
 router.delete(
   /*
