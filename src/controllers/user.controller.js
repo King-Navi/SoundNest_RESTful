@@ -5,7 +5,9 @@ const { EmailAlreadySend } = require("../service/exceptions/exceptions");
 const { verifyConfirmationCode } = require("../service/codeEmail.service");
 const { ValidationError } = require("../utils/exceptions/validation.exception");
 const ConfirmationReasons = require("../utils/enums/confirmationReasons");
-const { NonexistentAditionalInformation} = require("../utils/exceptions/user.exception");
+const {
+  NonexistentAditionalInformation,
+} = require("../utils/exceptions/user.exception");
 const NAME_FILE = "user.controller.js";
 
 async function getAditionalInfoUserController(req, res) {
@@ -28,9 +30,7 @@ async function getAditionalInfoUserController(req, res) {
 
 async function editUserPasswordController(req, res) {
   try {
-    const { code, newPassword } = req.body;
-    const { email, id } = req.user;
-
+    const { code, newPassword, email } = req.body;
     const result = verifyConfirmationCode(email, code);
     if (!result.valid) {
       const message =
@@ -44,7 +44,7 @@ async function editUserPasswordController(req, res) {
       return res.status(status).json({ error: message });
     }
 
-    await userService.editPassword(id, newPassword);
+    await userService.editPasswordByEmail(email, newPassword);
     res.status(204).send();
   } catch (err) {
     if (err instanceof ValidationError) {
@@ -175,5 +175,5 @@ module.exports = {
   editUser,
   recoverUser,
   editUserPasswordController,
-  getAditionalInfoUserController
+  getAditionalInfoUserController,
 };

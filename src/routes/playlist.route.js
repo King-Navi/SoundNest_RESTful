@@ -9,15 +9,19 @@ const {
   fecthPlaylistController,
   getPlaylistByIdControlller,
   editPlaylistController,
-  cleanListSongController
+  cleanListSongController,
+  uploadPlaylistImageBase64Controller,
 } = require("../controllers/uploadPlaylistImage.controller");
 const authorization = require("../middlewares/auth.middleware");
 const validateFileType = require("../middlewares/validateFileType");
 const validateNewPlaylist = require("../middlewares/validatePlaylist.middleware");
-const {validatePlaylistOwnership} = require("../middlewares/validatePlaylistOwnership.middleware");
+const {
+  validatePlaylistOwnership,
+} = require("../middlewares/validatePlaylistOwnership.middleware");
 const existPlaylist = require("../middlewares/existPlaylist.middleware");
-const validateIdSong = require("../middlewares/validateSongId.middleware")
-
+const validateIdSong = require("../middlewares/validateSongId.middleware");
+const validateNewPlaylistBase64 = require("../middlewares/validateNewPlaylistBase64.middleware");
+const validateImageBase64Format = require("../middlewares/base64IsImage.middleware");
 
 const PLAYLIST_BASIC_ROUTE = "/api/playlist";
 
@@ -74,7 +78,7 @@ router.patch(
 );
 
 router.patch(
-/*
+  /*
    #swagger.path = '/api/playlist/edit/:idPlaylist'
    #swagger.tags = ['Playlists']
    #swagger.summary = 'Edit a playlist'
@@ -171,7 +175,7 @@ router.get(
 );
 
 router.get(
-   /*
+  /*
     #swagger.path = '/api/playlist/:iduser/user'
     #swagger.tags = ['Playlists']
     #swagger.summary = 'Get all playlists by user ID'
@@ -228,7 +232,7 @@ router.get(
     }
   */
   `${PLAYLIST_BASIC_ROUTE}/:iduser/user`,
-  fecthPlaylistController,
+  fecthPlaylistController
 );
 
 router.patch(
@@ -299,7 +303,7 @@ router.patch(
   `${PLAYLIST_BASIC_ROUTE}/:idsong/:idPlaylist/remove`,
   authorization,
   validatePlaylistOwnership,
-  removeSongToPlaylistController,
+  removeSongToPlaylistController
 );
 
 router.patch(
@@ -370,7 +374,7 @@ router.patch(
   authorization,
   validatePlaylistOwnership,
   validateIdSong,
-  addSongToPlaylistController,
+  addSongToPlaylistController
 );
 
 router.delete(
@@ -526,6 +530,85 @@ router.put(
   validateFileType,
   validateNewPlaylist,
   uploadPlaylistImageController
+);
+
+router.put(
+  /*
+    #swagger.path = '/api/playlist/base64/upload'
+    #swagger.tags = ['Playlists']
+    #swagger.summary = 'Crear una nueva playlist con imagen en formato Base64'
+    #swagger.description = 'Permite a un usuario autenticado crear una nueva playlist enviando la imagen codificada en Base64. La imagen debe estar en formato PNG o JPG y debe incluir el encabezado MIME. El nombre de la playlist es obligatorio. La imagen se guarda en el servidor y se registra en la base de datos.'
+
+    #swagger.consumes = ['application/json']
+
+    #swagger.parameters['Authorization'] = {
+      in: 'header',
+      name: 'Authorization',
+      required: true,
+      type: 'string',
+      description: 'Bearer token JWT para autenticar al usuario'
+    }
+
+    #swagger.parameters['body'] = {
+      in: 'body',
+      required: true,
+      schema: {
+        $playlistName: "Nombre de la playlist",
+        description: "Descripción opcional",
+        $imageBase64: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD...",
+      }
+    }
+
+    #swagger.responses[201] = {
+      description: 'Playlist creada correctamente con imagen en base64',
+      schema: {
+        message: "Playlist created successfully",
+        playlist: {
+          _id: "68267d8ec27bdad6076766f8",
+          creator_id: 3,
+          playlist_name: "Nombre de prueba",
+          description: "Descripción",
+          image_path: "2025-05-22-uuid.jpeg",
+          songs: [],
+          createdAt: "2025-05-22T17:30:00.000Z",
+          __v: 0
+        }
+      }
+    }
+
+    #swagger.responses[400] = {
+      description: 'Falta algún campo obligatorio o imagen Base64 inválida',
+      schema: {
+        error: "Invalid image base64 format"
+      }
+    }
+
+    #swagger.responses[401] = {
+      description: 'Token no proporcionado',
+      schema: {
+        message: "No token provided"
+      }
+    }
+
+    #swagger.responses[403] = {
+      description: 'Token inválido o expirado',
+      schema: {
+        message: "Invalid or expired token"
+      }
+    }
+
+    #swagger.responses[500] = {
+      description: 'Error interno del servidor al guardar la imagen',
+      schema: {
+        error: "Failed to save image from base64"
+      }
+    }
+  */
+  `${PLAYLIST_BASIC_ROUTE}/base64/upload`,
+  authorization,
+  validateNewPlaylistBase64,
+  validateImageBase64Format,
+  uploadPlaylistImageBase64Controller
 );
 
 module.exports = router;

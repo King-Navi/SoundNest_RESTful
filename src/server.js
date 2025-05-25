@@ -26,10 +26,10 @@ const credentials = loadTLSCredentials();
 const playlistImagePath = process.env.PLAYLIST_IMAGE_PATH_JS;
 const songImagePath = process.env.SONGS_IMAGE_PATH_JS;
 
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
 app.use((err, req, res, next) => {
-  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
-    return res.status(400).json({ error: 'Invalid JSON payload' });
+  if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+    return res.status(400).json({ error: "Invalid JSON payload" });
   }
   next(err);
 });

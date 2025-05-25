@@ -1,5 +1,8 @@
 const fs = require("fs/promises");
-const { NotFoundError, BadRequestError } = require("../repositories/exceptions/song.exceptions");
+const {
+  NotFoundError,
+  BadRequestError,
+} = require("../repositories/exceptions/song.exceptions");
 const {
   getGenres,
   getExtensions,
@@ -13,15 +16,18 @@ const {
   deleteSongService,
   getListSongsByIdsService,
   updateDescriptionSongService,
+  BASE_FILE_NAME_SONG_IMAGE,
 } = require("../service/song.service");
 const { updateSongImage } = require("../service/songImage.service");
+const FileManager = require("../utils/fileManager");
+const path = require("path");
 
 async function updateDescriptionSong(req, res) {
   try {
     const { id } = req.user;
     const { idsong } = req.params;
     const { description } = req.body;
-    console.log(id)
+    console.log(id);
 
     await updateDescriptionSongService(idsong, id, description);
     return res.status(204).send();
@@ -73,6 +79,50 @@ async function updateImageSongController(req, res) {
       if (tmpDir) {
         await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
       }
+      return res
+        .status(500)
+        .json({ error: "Error al actualizar imagen: " + error.message });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch : " + error.message });
+  }
+}
+
+async function updateImageSongBase64Controller(req, res) {
+  try {
+    const songId = Number(req.params.idsong);
+    const { imageBase64 } = req.body;
+    console.log(
+      `[Controller] Iniciando actualización para canción ID: ${songId}`
+    );
+    if (!imageBase64) {
+      return res
+        .status(400)
+        .json({ error: "La imagen en base64 es requerida" });
+    }
+
+    const extension = imageBase64.match(/^data:image\/(png|jpeg|jpg)/i)?.[1];
+    if (!extension) {
+      return res
+        .status(400)
+        .json({ error: "Extensión de imagen inválida o no soportada" });
+    }
+
+    const baseName = `song-${songId}`;
+    const fileName = `${baseName}.${extension}`;
+
+    const fileManager = new FileManager("SONGS_IMAGE_PATH_JS");
+    const { path: savedPath } = await fileManager.saveImageFromBase64(
+      imageBase64,
+      fileName
+    );
+    const tmpDirPath = path.dirname(savedPath);
+
+    try {
+      await updateSongImage(songId, fileName, tmpDirPath);
+      return res.status(204).end();
+    } catch (error) {
+      console.error("[updateImageSongBase64Controller]", error);
       return res
         .status(500)
         .json({ error: "Error al actualizar imagen: " + error.message });
@@ -238,6 +288,7 @@ module.exports = {
   getSongOfUserController,
   getLastUserSongController,
   updateImageSongController,
+  updateImageSongBase64Controller,
   updateDescriptionSong,
   deleteSongController,
   getListOfSongByIds,

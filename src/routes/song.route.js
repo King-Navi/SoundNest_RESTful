@@ -10,9 +10,10 @@ const {
   getSongOfUserController,
   getLastUserSongController,
   updateImageSongController,
+  updateImageSongBase64Controller,
   updateDescriptionSong,
   deleteSongController,
-  getListOfSongByIds
+  getListOfSongByIds,
 } = require("../controllers/song.controller");
 const {
   validateSearchQuery,
@@ -21,14 +22,17 @@ const {
   validateParams,
   idParamSchema,
 } = require("../middlewares/validateIdParams.middleware");
-const {validateListOfSongsId} = require("../middlewares/validateListOfSongsIds.middleware")
+const {
+  validateListOfSongsId,
+} = require("../middlewares/validateListOfSongsIds.middleware");
 const autoriztion = require("../middlewares/auth.middleware");
 const validateFileType = require("../middlewares/validateFileType");
 const validateSongId = require("../middlewares/validateSongId.middleware");
 const validateSongOwnership = require("../middlewares/validateSongOwnership.middleware");
 const upload = require("../middlewares/uploadSongImage.middleware");
 const router = express.Router();
-
+const validateImageBase64Format = require("../middlewares/base64IsImage.middleware");
+const validateSongBase64 = require("../middlewares/uploadSongImageBase64.middleware");
 const SONG_BASIC_ROUTE = "/api/songs";
 
 router.patch(
@@ -71,7 +75,7 @@ router.patch(
   updateDescriptionSong
 );
 
-router.get(
+router.post(
   /*
  #swagger.path = '/api/songs/list/get'
  #swagger.tags = ['Songs']
@@ -212,6 +216,40 @@ router.patch(
   upload.single("imagefile"),
   validateFileType,
   updateImageSongController
+);
+
+router.patch(
+  /*
+    #swagger.path = '/api/songs/:idsong/base64/image'
+    #swagger.tags = ['Songs']
+    #swagger.summary = 'Upload or update an image for a song via base64 string'
+    #swagger.description = 'Allows a user to upload or replace the image associated with a song using a base64-encoded image string. Only the owner of the song or an admin can perform this action.'
+
+    #swagger.consumes = ['application/json']
+
+    #swagger.parameters['idsong'] = {
+      in: 'path',
+      description: 'ID of the song whose image will be updated',
+      required: true,
+      type: 'integer'
+    }
+
+    #swagger.parameters['imageBase64'] = {
+      in: 'body',
+      description: 'Base64-encoded image string (must include data:image/jpeg;base64,... or data:image/png;base64,...)',
+      required: true,
+      schema: {
+        imageBase64: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD...'
+      }
+    }
+  */
+  `${SONG_BASIC_ROUTE}/:idsong/base64/image`,
+  autoriztion,
+  validateSongId,
+  validateSongOwnership,
+  validateSongBase64,
+  validateImageBase64Format,
+  updateImageSongBase64Controller
 );
 
 router.get(

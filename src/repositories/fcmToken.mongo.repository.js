@@ -1,4 +1,4 @@
-const FcmToken = require('../modelsMongo/fcmTokens');
+const FcmToken = require("../modelsMongo/fcmTokens");
 
 /**
  * Creates a new FCM token entry in the database.
@@ -17,7 +17,6 @@ async function createToken(data) {
 async function existsByUserId(userId) {
   return await FcmToken.exists({ user_id: userId });
 }
-
 
 /**
  * Updates an existing token for a user with new data.
@@ -45,7 +44,6 @@ async function updateTokenByUserId(userId, newTokenData) {
 async function getTokenByUserId(userId) {
   return await FcmToken.findOne({ user_id: userId });
 }
-
 
 module.exports = {
   createToken,

@@ -3,14 +3,14 @@ const initModels = require("../models/init-models");
 const { SongPhoto } = initModels(sequelize);
 
 /*
-manual inserts because error of sequelizer with the name of createAt
+Manual inserts due to Sequelize error with the field name `createAt`
 */
 
 /**
- * Crea una nueva imagen de canción sin usar `updatedAt`
- * @param {string} fileName - Nombre del archivo (ej: song-12.jpg)
- * @param {string} extension - Extensión sin punto (ej: jpg)
- * @param {number} idSong - ID de la canción
+ * Creates a new song image without using `updatedAt`.
+ * @param {string} fileName - File name (e.g., song-12.jpg)
+ * @param {string} extension - File extension without the dot (e.g., jpg)
+ * @param {number} idSong - Song ID
  */
 async function create(fileName, extension, idSong) {
   if (!fileName || !extension || !idSong) {
@@ -30,10 +30,10 @@ async function create(fileName, extension, idSong) {
 }
 
 /**
- * Actualiza el nombre y extensión de una imagen existente.
- * @param {number} idSongPhoto - ID de la imagen
- * @param {string} fileName - Nuevo nombre de archivo
- * @param {string} extension - Nueva extensión (sin punto)
+ * Updates the file name and extension of an existing song image.
+ * @param {number} idSongPhoto - ID of the image
+ * @param {string} fileName - New file name
+ * @param {string} extension - New file extension (without the dot)
  */
 async function update(idSongPhoto, fileName, extension) {
   if (!idSongPhoto || !fileName || !extension) {
@@ -54,9 +54,9 @@ async function update(idSongPhoto, fileName, extension) {
 }
 
 /**
- * Obtiene una foto por idSong
- * @param {number} idSong - ID de la canción
- * @returns {Promise<Object|null>}
+ * Retrieves a song photo by its song ID.
+ * @param {number} idSong - Song ID
+ * @returns {Promise<Object|null>} The photo object, or null if not found.
  */
 async function getBySongPhotoId(idSong) {
   const [result] = await sequelize.query(

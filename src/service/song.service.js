@@ -24,10 +24,15 @@ const {
   getBySongPhotoId,
   deleteSongPhotoBySongId,
 } = require("../repositories/songPhoto.repository");
-const { NotFoundError, BadRequestError } = require("../repositories/exceptions/song.exceptions");
+const {
+  NotFoundError,
+  BadRequestError,
+} = require("../repositories/exceptions/song.exceptions");
 const SongDescriptionRepository = require("../repositories/songDescription.mongo.reposiroty");
 const songDescriptionRepo = new SongDescriptionRepository();
 const { publishDeleteSong } = require("../messaging/deleteSong.producer");
+
+const BASE_FILE_NAME_SONG_IMAGE = "song-";
 
 /**
  * Creates or updates only the description of a song.
@@ -42,15 +47,17 @@ const { publishDeleteSong } = require("../messaging/deleteSong.producer");
 async function updateDescriptionSongService(songId, userId, description) {
   const idSong = Number(songId);
   const idUser = Number(userId);
-  console.log(idUser)
+  console.log(idUser);
   if (!Number.isInteger(idSong) || idSong <= 0) {
-    throw new BadRequestError('Invalid songId: must be a positive integer');
+    throw new BadRequestError("Invalid songId: must be a positive integer");
   }
   if (!Number.isInteger(idUser) || idUser <= 0) {
-    throw new BadRequestError('Invalid userId: must be a positive integer');
+    throw new BadRequestError("Invalid userId: must be a positive integer");
   }
-  if (typeof description !== 'string' || description.trim().length === 0) {
-    throw new BadRequestError('Invalid description: must be a non-empty string');
+  if (typeof description !== "string" || description.trim().length === 0) {
+    throw new BadRequestError(
+      "Invalid description: must be a non-empty string"
+    );
   }
   let updated = await songDescriptionRepo.updateDescriptionBySongId(
     idSong,
@@ -58,9 +65,9 @@ async function updateDescriptionSongService(songId, userId, description) {
   );
   if (!updated) {
     updated = await songDescriptionRepo.create({
-      songs_id:   idSong,
-      author_id:  idUser,
-      description: description.trim()
+      songs_id: idSong,
+      author_id: idUser,
+      description: description.trim(),
     });
   }
   return updated;
@@ -191,6 +198,7 @@ async function getRecent(number) {
     } else {
       queryResult = await getRecentSongs();
     }
+
     return await formatSongList(queryResult);
   } catch (error) {
     throw error;
@@ -276,7 +284,7 @@ async function formatSong(songInstance) {
   }
 
   const data = song.toJSON();
-  const photo = data.SongPhotos?.[0];
+  const photo = await getBySongPhotoId(songInstance.idSong);
   const pathImageUrl = photo
     ? `/images/songs/${photo.fileName}.${photo.extension}`
     : null;
@@ -328,4 +336,5 @@ module.exports = {
   deleteSongService,
   getListSongsByIdsService,
   updateDescriptionSongService,
+  BASE_FILE_NAME_SONG_IMAGE,
 };

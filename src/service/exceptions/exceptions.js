@@ -37,7 +37,7 @@ class SongNotInPlaylist extends Error {
     this.statusCode = 400;
   }
 }
-class NonexistentVisualization extends Error{
+class NonexistentVisualization extends Error {
   constructor(message = "not in the playlist") {
     super(message);
     this.name = "Not in playlist";
@@ -51,5 +51,5 @@ module.exports = {
   NonexistentPlaylist,
   SongAlreadyInPlaylist,
   SongNotInPlaylist,
-  NonexistentVisualization
+  NonexistentVisualization,
 };

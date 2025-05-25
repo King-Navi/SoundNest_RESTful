@@ -11,7 +11,7 @@ async function notificationConsumer() {
 
   channel.consume(QUEUE, async (msg) => {
     if (!msg) return;
-    
+
     const raw = parseMessage(msg);
     if (raw === null) return channel.nack(msg, false, false);
 
@@ -23,8 +23,8 @@ async function notificationConsumer() {
 
     try {
       await createNotification(enriched);
-      
-      if (process.env.ENVIROMENT === 'development') {
+
+      if (process.env.ENVIROMENT === "development") {
         console.log("+DEBUG+ [Consumer] Notification created:", enriched);
       }
       channel.ack(msg);

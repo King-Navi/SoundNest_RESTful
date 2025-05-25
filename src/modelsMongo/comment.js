@@ -1,16 +1,14 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-
-
 const commentSchema = new Schema({
-  song_id:{
+  song_id: {
     type: Number,
-    required : true
+    required: true,
   },
-  author_id:{
+  author_id: {
     type: Number,
-    required : true
+    required: true,
   },
   user: {
     type: String,
@@ -26,19 +24,19 @@ const commentSchema = new Schema({
   },
   parent_id: {
     type: Schema.Types.ObjectId,
-    ref: 'Comment',
+    ref: "Comment",
     default: null,
   },
 });
 
-commentSchema.virtual('responses', {
-  ref: 'Comment',
-  localField: '_id',
-  foreignField: 'parent_id'
+commentSchema.virtual("responses", {
+  ref: "Comment",
+  localField: "_id",
+  foreignField: "parent_id",
 });
 
-commentSchema.set('toObject', { virtuals: true });
-commentSchema.set('toJSON', { virtuals: true });
+commentSchema.set("toObject", { virtuals: true });
+commentSchema.set("toJSON", { virtuals: true });
 
-const Comment = mongoose.model('Comment', commentSchema);
+const Comment = mongoose.model("Comment", commentSchema);
 module.exports = { Comment };

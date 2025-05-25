@@ -1,6 +1,6 @@
-const { connectRabbit } = require('../config/rabbit');
+const { connectRabbit } = require("../config/rabbit");
 
-const QUEUE = 'song.delete';
+const QUEUE = "song.delete";
 
 /**
  * Publishes a message indicating that a song should be deleted.
@@ -8,8 +8,8 @@ const QUEUE = 'song.delete';
  * @returns {Promise<void>}
  */
 async function publishDeleteSong(idSong) {
-  if (!idSong || typeof idSong !== 'number') {
-    throw new Error('publishDeleteSong expects a valid numeric idSong');
+  if (!idSong || typeof idSong !== "number") {
+    throw new Error("publishDeleteSong expects a valid numeric idSong");
   }
 
   const channel = await connectRabbit();
@@ -22,7 +22,7 @@ async function publishDeleteSong(idSong) {
     persistent: true,
   });
 
-  console.log('[Producer] Sent deleteSong message:', { idSong });
+  console.log("[Producer] Sent deleteSong message:", { idSong });
 }
 
 module.exports = { publishDeleteSong };

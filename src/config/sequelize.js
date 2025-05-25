@@ -1,4 +1,4 @@
-const { Sequelize } = require('sequelize');
+const { Sequelize } = require("sequelize");
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
@@ -7,18 +7,16 @@ const sequelize = new Sequelize(
   {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
-    dialect: 'mysql',
+    dialect: "mysql",
     dialectOptions: {
-      charset: 'utf8mb4',
+      charset: "utf8mb4",
     },
     define: {
-      charset: 'utf8mb4',
-      collate: 'utf8mb4_unicode_ci',
+      charset: "utf8mb4",
+      collate: "utf8mb4_unicode_ci",
     },
-    logging: false
+    logging: false,
   }
 );
-
-
 
 module.exports = sequelize;

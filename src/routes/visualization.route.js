@@ -2,7 +2,50 @@ const express = require("express");
 const router = express.Router();
 const visualizationController = require("../controllers/visualization.controller");
 const validateSongId = require("../middlewares/validateSongId.middleware");
+const {
+  validateUserIdParam,
+} = require("../middlewares/validateIdUser.middleware");
+const { userStatsController } = require("../controllers/stats.controller");
+
 const VISUALIZATION_BASIC_ROUTE = "/api/visit";
+
+router.get(
+  /**
+  #swagger.tags = ['Visualizations']
+  #swagger.path = '/api/visit/users/:idUser/stats'
+  #swagger.summary = 'Get total plays and top song for a user'
+  #swagger.description = 'Returns the total number of plays of all songs of a user, the name of the most played song, and its play count.'
+  #swagger.parameters['idUser'] = {
+    in: 'path',
+    description: 'ID of the user',
+    required: true,
+    schema: { type: 'integer' }
+  }
+  #swagger.responses[200] = {
+    description: 'User statistics retrieved successfully',
+    schema: {
+      totalPlays: 100,
+      topSongName: 'Song Title',
+      playCount: 50
+    }
+  }
+  #swagger.responses[400] = {
+    description: 'Invalid user ID',
+    schema: { error: 'Invalid user ID' }
+  }
+  #swagger.responses[404] = {
+    description: 'User not found or no songs',
+    schema: { error: 'No statistics found for user ...' }
+  }
+  #swagger.responses[500] = {
+    description: 'Server error',
+    schema: { error: 'Error message' }
+  }
+*/
+  `${VISUALIZATION_BASIC_ROUTE}/users/:idUser/stats`,
+  validateUserIdParam,
+  userStatsController
+);
 
 router.post(
   /*

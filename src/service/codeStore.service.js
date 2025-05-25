@@ -16,7 +16,7 @@ function deleteCode(email) {
 }
 
 function hasCode(code) {
-  return [...codeStore.values()].some(e => String(e.code) === String(code));
+  return [...codeStore.values()].some((e) => String(e.code) === String(code));
 }
 
 module.exports = {

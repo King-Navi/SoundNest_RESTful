@@ -1,7 +1,7 @@
 class NotFoundError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'NotFoundError';
+    this.name = "NotFoundError";
     this.statusCode = 404;
   }
 }
@@ -9,19 +9,18 @@ class NotFoundError extends Error {
 class DeletedError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'DeletedError';
+    this.name = "DeletedError";
     this.statusCode = 410;
   }
 }
 
-class BadRequestError  extends Error {
+class BadRequestError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'Error validating';
+    this.name = "Error validating";
     this.statusCode = 400;
   }
 }
-
 
 module.exports = {
   NotFoundError,

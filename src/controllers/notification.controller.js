@@ -1,4 +1,4 @@
-const notificationService = require('../service/notification.service');
+const notificationService = require("../service/notification.service");
 
 async function createNotification(req, res) {
   try {
@@ -11,7 +11,9 @@ async function createNotification(req, res) {
 
 async function getNotificationById(req, res) {
   try {
-    const notification = await notificationService.getNotificationById(req.params.id);
+    const notification = await notificationService.getNotificationById(
+      req.params.id
+    );
     res.json(notification);
   } catch (err) {
     res.status(404).json({ error: err.message });
@@ -20,7 +22,9 @@ async function getNotificationById(req, res) {
 
 async function getAllNotificationsForUser(req, res) {
   try {
-    const notifications = await notificationService.getAllNotificationsForUser(req.params.userId);
+    const notifications = await notificationService.getAllNotificationsForUser(
+      req.params.userId
+    );
     res.json(notifications);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -29,7 +33,10 @@ async function getAllNotificationsForUser(req, res) {
 
 async function updateNotificationById(req, res) {
   try {
-    const updated = await notificationService.updateNotificationById(req.params.id, req.body);
+    const updated = await notificationService.updateNotificationById(
+      req.params.id,
+      req.body
+    );
     res.json(updated);
   } catch (err) {
     res.status(404).json({ error: err.message });
@@ -50,13 +57,13 @@ async function markNotificationAsRead(req, res) {
     await notificationService.markNotificationAsRead(req.params.id);
     res.status(204).send();
   } catch (err) {
-    if (err.message === 'Invalid ID format') {
+    if (err.message === "Invalid ID format") {
       res.status(400).json({ error: err.message });
-  } else if (err.message === 'Notification not found') {
+    } else if (err.message === "Notification not found") {
       res.status(404).json({ error: err.message });
-  } else {
-      res.status(500).json({ error: 'Internal server error' });
-  }
+    } else {
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
 }
 

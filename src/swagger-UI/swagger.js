@@ -11,28 +11,27 @@
  *
  * @requires swagger-autogen
  */
-const fs = require('fs');
-const swaggerAutogen = require('swagger-autogen')();
+const fs = require("fs");
+const swaggerAutogen = require("swagger-autogen")();
 
 const doc = {
   info: {
-    title: 'SoundNest API',
-    description: 'Documentación de mi API RESTful',
+    title: "SoundNest API",
+    description: "Documentación de mi API RESTful",
   },
-  host: 'localhost:6969',
-  schemes: ['https', 'http'],
+  host: "localhost:6969",
+  schemes: ["https", "http"],
 };
 
-const outputFile = './swagger-output.json';
+const outputFile = "./swagger-output.json";
 const endpointsFiles = [
-  './src/routes/auth.route.js',
-  './src/routes/user.route.js',
-  './src/routes/comment.route.js',
-  './src/routes/notification.route.js',
-  './src/routes/song.route.js',
-  './src/routes/playlist.route.js',
-  './src/routes/visualization.route.js'
-  //TODO: ¡add more routes here!
+  "./src/routes/auth.route.js",
+  "./src/routes/user.route.js",
+  "./src/routes/comment.route.js",
+  "./src/routes/notification.route.js",
+  "./src/routes/song.route.js",
+  "./src/routes/playlist.route.js",
+  "./src/routes/visualization.route.js",
 ];
 
 endpointsFiles.forEach((file) => {
@@ -41,8 +40,8 @@ endpointsFiles.forEach((file) => {
   }
 });
 
-console.log('Generando documentación...');
+console.log("Generando documentación...");
 
 swaggerAutogen(outputFile, endpointsFiles, doc).then(() => {
-  console.log('Documentación generada');
+  console.log("Documentación generada");
 });

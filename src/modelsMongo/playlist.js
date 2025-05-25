@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
 const playlistSchema = new mongoose.Schema({
-  creator_id:{
+  creator_id: {
     type: Number,
-    required: true
+    required: true,
   },
   playlist_name: {
     type: String,
@@ -17,16 +17,18 @@ const playlistSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  songs: [{
-    song_id: {
-      type: Number,
-      required: false
+  songs: [
+    {
+      song_id: {
+        type: Number,
+        required: false,
+      },
+      addedAt: {
+        type: Date,
+        default: Date.now,
+      },
     },
-    addedAt: {
-      type: Date,
-      default: Date.now
-    }
-  }],
+  ],
   createdAt: {
     type: Date,
     default: Date.now,

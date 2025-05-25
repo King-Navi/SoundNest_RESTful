@@ -1,10 +1,12 @@
 const PlaylistRepository = require("../repositories/playlist.mongo.repository");
-const playlistRepo = new PlaylistRepository()
+const playlistRepo = new PlaylistRepository();
 async function validatePlaylistOwnership(req, res, next) {
   const { idPlaylist } = req.params;
-  const idUser  = req.user.id
-  if (!idPlaylist ) {
-    return res.status(400).json({ error: "Playlist not loaded in the request" });
+  const idUser = req.user.id;
+  if (!idPlaylist) {
+    return res
+      .status(400)
+      .json({ error: "Playlist not loaded in the request" });
   }
   let playlistResult = await playlistRepo.getPlaylistById(idPlaylist);
   if (!playlistResult) {

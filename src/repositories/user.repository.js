@@ -79,7 +79,7 @@ async function findUserById(id) {
   try {
     const user = await AppUser.findByPk(id);
     if (!user) {
-      throw new Error("User not found. Id" +id);
+      throw new Error("User not found. Id" + id);
     }
     return user;
   } catch (error) {
@@ -93,6 +93,23 @@ async function findUserById(id) {
   }
 }
 
+async function updateUserPasswordByEmail(email, hashedPassword) {
+  const [rowsUpdated] = await AppUser.update(
+    { password: hashedPassword },
+    {
+      where: Sequelize.where(
+        Sequelize.fn("LOWER", Sequelize.col("email")),
+        Op.eq,
+        email.toLowerCase()
+      ),
+    }
+  );
+
+  if (rowsUpdated === 0) {
+    throw new Error("User not found or password not updated");
+  }
+}
+
 module.exports = {
   ID_ROLE_ADMIN,
   findUserByEmail,
@@ -100,4 +117,5 @@ module.exports = {
   createUser,
   updateUserById,
   findUserById,
+  updateUserPasswordByEmail,
 };

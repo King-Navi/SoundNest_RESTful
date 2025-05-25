@@ -39,14 +39,14 @@ describe('SongDescriptionRepository', () => {
 
   describe('updateBySongId', () => {
     it('debería actualizar y retornar la descripción actualizada', async () => {
-      const updated = { songs_id: 1, description: 'nueva' };
+      const updated = { songs_id: 1, description: 'viejo' };
       SongDescription.findOneAndUpdate.mockResolvedValue(updated);
 
-      const result = await repository.updateBySongId(1, { description: 'nueva' });
+      const result = await repository.updateDescriptionBySongId(1,  "Nuevo");
 
       expect(SongDescription.findOneAndUpdate).toHaveBeenCalledWith(
         { songs_id: 1 },
-        { $set: { description: 'nueva' } },
+        { $set: { description: 'Nuevo' } },
         { new: true }
       );
       expect(result).toEqual(updated);

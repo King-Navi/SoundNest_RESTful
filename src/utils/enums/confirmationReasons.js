@@ -4,6 +4,6 @@ const ConfirmationReasons = {
   SUCCESS: "success",
 };
 
-module.exports ={
-    ConfirmationReasons,
-}
+module.exports = {
+  ConfirmationReasons,
+};

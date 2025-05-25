@@ -1,26 +1,22 @@
-const Joi = require('joi');
+const Joi = require("joi");
 
 const listOfSongIdsSchema = Joi.object({
   songIds: Joi.array()
     .items(
-      Joi.number()
-        .integer()
-        .positive()
-        .required()
-        .messages({
-          'number.base': 'Each song ID must be a number',
-          'number.integer': 'Each song ID must be an integer',
-          'number.positive': 'Each song ID must be greater than 0',
-          'any.required': 'Song ID cannot be empty'
-        })
+      Joi.number().integer().positive().required().messages({
+        "number.base": "Each song ID must be a number",
+        "number.integer": "Each song ID must be an integer",
+        "number.positive": "Each song ID must be greater than 0",
+        "any.required": "Song ID cannot be empty",
+      })
     )
     .min(1)
     .required()
     .messages({
-      'any.required': 'The field songIds is required',
-      'array.base': 'The field songIds must be an array',
-      'array.min': 'The list must contain at least one song ID'
-    })
+      "any.required": "The field songIds is required",
+      "array.base": "The field songIds must be an array",
+      "array.min": "The list must contain at least one song ID",
+    }),
 });
 
 /**

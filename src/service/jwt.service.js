@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 const verifyJwtToken = (token) => {
   try {
@@ -18,5 +18,5 @@ const generateToken = (user) => {
     process.env.JWT_SECRET,
     { expiresIn: "23h" }
   );
-}
+};
 module.exports = { generateToken, verifyJwtToken };

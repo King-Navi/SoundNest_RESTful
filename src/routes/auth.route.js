@@ -2,17 +2,14 @@ const express = require("express");
 const router = express.Router();
 const authorization = require("../middlewares/auth.middleware");
 const { loginUser } = require("../controllers/login.controller");
-const {
-  sendCode,
-  compareCode,
-}= require("../controllers/user.controller");
-const {recoverUser} = require("../controllers/user.controller");
-const {UpdateFCMTokenController} = require("../controllers/auth.controller");
+const { sendCode, compareCode } = require("../controllers/user.controller");
+const { recoverUser } = require("../controllers/user.controller");
+const { UpdateFCMTokenController } = require("../controllers/auth.controller");
 
 const AUTH_BASIC_ROUTE = "/api/auth";
 
 router.post(
-    /*
+  /*
   #swagger.path = '/api/auth/fcm/update'
   #swagger.tags = ['Auth']
   #swagger.description = 'Register or update a user\'s FCM token. Requires JWT authorization.'

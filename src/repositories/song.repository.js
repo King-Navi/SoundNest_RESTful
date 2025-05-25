@@ -3,10 +3,9 @@ const initModels = require("../models/init-models");
 const { Op, fn, col, literal } = require("sequelize");
 const models = initModels(sequelize);
 const { Song, Visualization, AppUser, SongPhoto } = models;
-const {NotFoundError} = require("./exceptions/song.exceptions")
+const { NotFoundError } = require("./exceptions/song.exceptions");
 
 const MAX_SONGS_RECOVER = 40;
-
 
 async function getByIdWithDetails(idSong) {
   return await Song.findByPk(idSong, {
@@ -29,7 +28,6 @@ async function getByIdWithDetails(idSong) {
     ],
   });
 }
-
 
 /**
  * Retrieves a list of songs based on optional filters and pagination.
@@ -182,19 +180,24 @@ async function getMostViewedSongs(limit = 10) {
     limit: safeLimit,
   });
 }
-async function getMostViewedSongsThisMonth(year, month, limit = MAX_SONGS_RECOVER) {
+async function getMostViewedSongsThisMonth(
+  year,
+  month,
+  limit = MAX_SONGS_RECOVER
+) {
   const safeLimit = Math.min(limit, 60);
   const now = new Date();
 
   const targetYear = year && !isNaN(year) ? Number(year) : now.getFullYear();
-  const targetMonth = month && !isNaN(month) && month >= 1 && month <= 12
-    ? Number(month)
-    : now.getMonth() + 1;
+  const targetMonth =
+    month && !isNaN(month) && month >= 1 && month <= 12
+      ? Number(month)
+      : now.getMonth() + 1;
 
   const startDate = new Date(targetYear, targetMonth - 1, 1);
   const endDate = new Date(targetYear, targetMonth, 1);
 
-  try{
+  try {
     return await Song.findAll({
       subQuery: false,
       where: { isDeleted: false },
@@ -213,17 +216,15 @@ async function getMostViewedSongsThisMonth(year, month, limit = MAX_SONGS_RECOVE
         },
       ],
       attributes: {
-        include: [
-          [ fn('SUM', col('Visualizations.playCount')), 'monthlyViews' ]
-        ],
+        include: [[fn("SUM", col("Visualizations.playCount")), "monthlyViews"]],
       },
       group: ["Song.idSong"],
       having: literal("monthlyViews IS NOT NULL"),
       order: [[literal("monthlyViews"), "DESC"]],
       limit: safeLimit,
     });
-  }catch(error){
-    console.error(error)
+  } catch (error) {
+    console.error(error);
   }
 }
 async function getSongsByIds(songIds) {
@@ -255,9 +256,9 @@ async function getSongById(id) {
       {
         model: AppUser,
         as: "idAppUser_AppUser",
-        attributes: ["nameUser"]
-      }
-    ]
+        attributes: ["nameUser"],
+      },
+    ],
   });
 
   return song;
@@ -277,9 +278,9 @@ async function getSongsByUserId(userId) {
   const songs = await Song.findAll({
     where: {
       idAppUser: userId,
-      isDeleted: false
+      isDeleted: false,
     },
-    order: [["releaseDate", "DESC"]]
+    order: [["releaseDate", "DESC"]],
   });
 
   return songs;
@@ -299,9 +300,9 @@ async function getMostRecentSongByUser(userId) {
   const song = await Song.findOne({
     where: {
       idAppUser: userId,
-      isDeleted: false
+      isDeleted: false,
     },
-    order: [["releaseDate", "DESC"]]
+    order: [["releaseDate", "DESC"]],
   });
 
   return song;
@@ -323,5 +324,5 @@ module.exports = {
   getSongsByUserId,
   getMostRecentSongByUser,
   updateSongSetDeleted,
-  getByIdWithDetails
+  getByIdWithDetails,
 };

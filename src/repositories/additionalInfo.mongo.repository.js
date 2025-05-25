@@ -17,7 +17,9 @@ async function saveAdditionalInformation(userId, info) {
     );
   } catch (err) {
     if (err.code === 11000) {
-      return res.status(400).json({ error: 'User additional info already exists' });
+      return res
+        .status(400)
+        .json({ error: "User additional info already exists" });
     }
     throw err;
   }
@@ -48,7 +50,7 @@ async function deleteAdditionalInformation(userId) {
  * @returns {Promise<Boolean>} - True if the user has additional information, false otherwise.
  */
 async function hasAdditionalInformation(userId) {
-  const info = await AdditionalInfo.findOne({ userId }, '_id');
+  const info = await AdditionalInfo.findOne({ userId }, "_id");
   return !!info;
 }
 module.exports = {

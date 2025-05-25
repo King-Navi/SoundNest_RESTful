@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const userRepository = require("../repositories/user.repository");
 const { comparePasswords } = require("../utils/hash.util");
 const { ValidationError } = require("../utils/exceptions/validation.exception");
-const {generateToken } = require("../service/jwt.service")
+const { generateToken } = require("../service/jwt.service");
 async function loginService({ username, password }) {
   const user = await userRepository.findUserByName(username);
 

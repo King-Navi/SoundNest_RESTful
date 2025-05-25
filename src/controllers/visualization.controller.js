@@ -1,8 +1,9 @@
 const visualizationService = require("../service/visualization.service");
 const songService = require("../service/song.service");
-const {checkAndNotifySongVisits} = require("../service/messaging.service");
-const { NonexistentVisualization } = require("../service/exceptions/exceptions");
-
+const { checkAndNotifySongVisits } = require("../service/messaging.service");
+const {
+  NonexistentVisualization,
+} = require("../service/exceptions/exceptions");
 
 async function incrementPlayCount(req, res) {
   const { idSong } = req.song;
@@ -11,14 +12,13 @@ async function incrementPlayCount(req, res) {
     await checkAndNotifySongVisits(req.song);
     res.status(204).send();
   } catch (err) {
-    console.log(err)
+    console.log(err);
     res.status(500).json({ error: err.message });
   }
 }
 
-
 async function getVisualizationByPeriod(req, res) {
-  const {idSong} = req.song;
+  const { idSong } = req.song;
   const { year, month } = req.params;
   try {
     const result = await visualizationService.getVisualizationBySongAndPeriod(
@@ -35,28 +35,23 @@ async function getVisualizationByPeriod(req, res) {
   }
 }
 
-
 async function listVisualizationsBySong(req, res) {
   const { idSong } = req.song;
   try {
-    const results = await visualizationService.getVisualizationsForSong(Number(idSong));
+    const results = await visualizationService.getVisualizationsForSong(
+      Number(idSong)
+    );
     res.status(200).json(results);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 }
 
-
 async function getTopSongsVisits(req, res) {
   const { year, month } = req.params;
   const { limit } = req.query;
   try {
-      
-
-    if (
-      !Number.isInteger(Number(month)) ||
-      !Number.isInteger(Number(year))
-    ) {
+    if (!Number.isInteger(Number(month)) || !Number.isInteger(Number(year))) {
       return res.status(400).json({ error: "Invalid month or year" });
     }
     const result = await visualizationService.getTopSongsByPeriod(

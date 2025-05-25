@@ -11,14 +11,28 @@ describe('PlaylistRepository', () => {
   });
 
   test('createPlaylist - should save and return a new playlist', async () => {
-    const mockData = { playlist_name: 'Test', description: 'Desc', creator_id: 1, image_path: 'path.jpg', songs: [] };
-    const mockSave = jest.fn().mockResolvedValue(mockData);
+    const rawData = {
+      playlist_name: 'Test',
+      description: 'Desc',
+      creator_id: 1,
+      image_path: 'path.jpg',
+      songs: []
+    };
+
+    const savedData = { ...rawData }; 
+    const mockSave = jest.fn().mockResolvedValue(savedData);
+
     Playlist.mockImplementation(() => ({ save: mockSave }));
 
-    const result = await repo.createPlaylist(mockData);
+    const expected = {
+      ...rawData,
+      image_path: '/images/playlists/path.jpg',
+    };
+
+    const result = await repo.createPlaylist(rawData);
 
     expect(mockSave).toHaveBeenCalled();
-    expect(result).toEqual(mockData);
+    expect(result).toEqual(expected);
   });
 
   test('getPlaylistById - should return playlist by id', async () => {

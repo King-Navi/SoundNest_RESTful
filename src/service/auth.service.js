@@ -1,4 +1,4 @@
-const fcmTokenRepository = require("../repositories/fcmToken.mongo.repository")
+const fcmTokenRepository = require("../repositories/fcmToken.mongo.repository");
 /**
  * Create or update a user's FCM token.
  * Updates only if the token or device data changed.
@@ -12,9 +12,9 @@ const fcmTokenRepository = require("../repositories/fcmToken.mongo.repository")
 async function UpdateFcmTokenService({
   user_id,
   token,
-  device = 'android',
+  device = "android",
   platform_version,
-  app_version
+  app_version,
 }) {
   const existingToken = await fcmTokenRepository.getTokenByUserId(user_id);
 

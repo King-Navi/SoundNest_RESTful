@@ -17,9 +17,8 @@ class NonexistentAditionalInformation extends HttpError {
   }
 }
 
-
 module.exports = {
   EmailAlreadyExist,
   UserNameAlreadyExist,
-  NonexistentAditionalInformation
+  NonexistentAditionalInformation,
 };

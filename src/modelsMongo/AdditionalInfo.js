@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const AdditionalInfoSchema = new mongoose.Schema({
   userId: {
@@ -13,4 +13,4 @@ const AdditionalInfoSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('AdditionalInfo', AdditionalInfoSchema);
+module.exports = mongoose.model("AdditionalInfo", AdditionalInfoSchema);

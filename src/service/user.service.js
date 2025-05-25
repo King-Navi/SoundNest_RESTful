@@ -4,7 +4,7 @@ const validator = require("validator");
 const {
   EmailAlreadyExist,
   UserNameAlreadyExist,
-  NonexistentAditionalInformation
+  NonexistentAditionalInformation,
 } = require("../utils/exceptions/user.exception");
 const { ValidationError } = require("../utils/exceptions/validation.exception");
 const { hashPassword } = require("../utils/hash.util");
@@ -18,7 +18,9 @@ const MAX_EMAIL_LENGTH = 100;
 async function getAditionalInfoUserService(id) {
   const exists = await additionalInfoRepository.hasAdditionalInformation(id);
   if (!exists) {
-    throw new NonexistentAditionalInformation('No additional information found for this user.');
+    throw new NonexistentAditionalInformation(
+      "No additional information found for this user."
+    );
   }
   const result = await additionalInfoRepository.getAdditionalInformation(id);
   return { info: result.info };
@@ -32,6 +34,11 @@ async function editPassword(userId, newPassword) {
 
   const hashed = await hashPassword(newPassword);
   await userRepository.updateUserById(userId, { password: hashed });
+}
+
+async function editPasswordByEmail(email, newPassword) {
+  const hashed = await hashPassword(newPassword);
+  await userRepository.updateUserPasswordByEmail(email, hashed);
 }
 
 async function registerUser({
@@ -113,7 +120,6 @@ async function updateUser(userId, updateData) {
   return updatedUser;
 }
 
-
 /**
  * Retrieve a user by its ID, sanitize the result by removing the password field,
  * and return a plain object or null if the user does not exist.
@@ -128,10 +134,10 @@ async function updateUser(userId, updateData) {
  *   idRole: number
  * } | null>}
  *   Resolves to an object with the following properties (password is omitted):
- *   - **idUser**: numeric database primary key  
- *   - **nameUser**: the user's username  
- *   - **email**: the user's email address  
- *   - **idRole**: the role ID assigned to the user  
+ *   - **idUser**: numeric database primary key
+ *   - **nameUser**: the user's username
+ *   - **email**: the user's email address
+ *   - **idRole**: the role ID assigned to the user
  *   Or `null` if no user is found.
  * @throws {ValidationError}
  *   If `userId` is missing or falsy.
@@ -160,5 +166,6 @@ module.exports = {
   updateUser,
   getUserById,
   editPassword,
-  getAditionalInfoUserService
+  getAditionalInfoUserService,
+  editPasswordByEmail,
 };

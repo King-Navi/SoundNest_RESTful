@@ -3,8 +3,6 @@ const fs = require("fs/promises");
 const SongRepository = require("../repositories/song.repository");
 const SongPhotoRepository = require("../repositories/songPhoto.repository");
 
-
-
 async function updateSongImage(songId, fileName, tmpDirPath) {
   const ext = path.extname(fileName);
   if (!ext) throw new Error("Extensión de archivo inválida");
@@ -17,16 +15,33 @@ async function updateSongImage(songId, fileName, tmpDirPath) {
   const song = await SongRepository.getSongById(songId);
   if (!song) throw new Error("Canción no encontrada");
 
-  const existingPhoto = await SongPhotoRepository.getBySongId(songId);
+  const existingPhoto = await SongPhotoRepository.getBySongPhotoId(songId);
 
   if (existingPhoto) {
-    await SongPhotoRepository.update(existingPhoto.idSongPhoto, baseName, extension);
+    await SongPhotoRepository.update(
+      existingPhoto.idSongPhoto,
+      baseName,
+      extension
+    );
   } else {
     await SongPhotoRepository.create(baseName, extension, songId);
   }
   await fs.mkdir(path.dirname(finalPath), { recursive: true });
-  await fs.rename(tempFilePath, finalPath);
-  await fs.rm(tmpDirPath, { recursive: true, force: true });
+  const exists = await fs
+    .access(tempFilePath)
+    .then(() => true)
+    .catch(() => false);
+  if (!exists) {
+    throw new Error("Archivo temporal no encontrado antes de renombrar");
+  }
+  if (tempFilePath !== finalPath) {
+    await fs.rename(tempFilePath, finalPath);
+  }
+  if (
+    tmpDirPath !== path.resolve(process.cwd(), process.env.SONGS_IMAGE_PATH_JS)
+  ) {
+    await fs.rm(tmpDirPath, { recursive: true, force: true });
+  }
 }
 
 module.exports = {

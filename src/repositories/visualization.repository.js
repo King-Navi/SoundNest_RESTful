@@ -62,10 +62,10 @@ async function getVisualizationsBySongId(idSong) {
 }
 
 /**
- * Crea un nuevo registro de visualización
- * @param {number} playCount - Número de reproducciones
- * @param {string} period - Fecha del periodo en formato 'YYYY-MM-DD'
- * @param {number} idSong - ID de la canción
+ * Creates a new view (play) record.
+ * @param {number} playCount - Number of plays
+ * @param {string} period - Period date in 'YYYY-MM-DD' format
+ * @param {number} idSong - Song ID
  */
 async function create(playCount, period, idSong) {
   if (playCount == null || !period || idSong == null) {
@@ -80,10 +80,10 @@ async function create(playCount, period, idSong) {
 }
 
 /**
- * Verifica si existe una visualización para una canción en un mes y año dados
- * @param {number} idSong - ID de la canción
- * @param {number} month - Mes (1-12)
- * @param {number} year - Año (YYYY)
+ * Checks if a play record exists for a song in a given month and year.
+ * @param {number} idSong - Song ID
+ * @param {number} month - Month (1–12)
+ * @param {number} year - Year (YYYY)
  * @returns {Promise<boolean>}
  */
 async function existsByIdAndPeriodMonthYear(idSong, month, year) {
@@ -110,9 +110,9 @@ async function existsByIdAndPeriodMonthYear(idSong, month, year) {
 }
 
 /**
- * Incrementa en 1 el contador de reproducciones para una visualización específica
- * @param {number} idVisualization - ID del registro en la tabla Visualization
- * @returns {Promise<boolean>} true si se actualizó, false si no se encontró
+ * Increments the play count by 1 for a specific visualization record.
+ * @param {number} idVisualization - ID of the record in the Visualization table
+ * @returns {Promise<boolean>} true if updated, false if not found
  */
 async function incrementPlayCountById(idVisualization) {
   if (!idVisualization || !Number.isInteger(idVisualization)) {
@@ -128,10 +128,10 @@ async function incrementPlayCountById(idVisualization) {
 }
 
 /**
- * Recupera una visualización por idSong, mes y año del campo `period`
+ * Retrieves a visualization by idSong, month, and year from the `period` field.
  * @param {number} idSong
- * @param {number} month - Mes (1-12)
- * @param {number} year - Año (ej. 2025)
+ * @param {number} month - Month (1–12)
+ * @param {number} year - Year (e.g., 2025)
  * @returns {Promise<Object|null>}
  */
 async function getBySongAndPeriodMonthYear(idSong, month, year) {

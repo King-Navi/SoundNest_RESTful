@@ -1,4 +1,4 @@
-const { UpdateFcmTokenService } = require('../service/auth.service');
+const { UpdateFcmTokenService } = require("../service/auth.service");
 
 async function UpdateFCMTokenController(req, res) {
   try {
@@ -6,7 +6,7 @@ async function UpdateFCMTokenController(req, res) {
     const user_id = req.user?.id;
 
     if (!user_id || !token) {
-      return res.status(400).json({ message: 'Missing user_id or token' });
+      return res.status(400).json({ message: "Missing user_id or token" });
     }
 
     await UpdateFcmTokenService({
@@ -14,13 +14,13 @@ async function UpdateFCMTokenController(req, res) {
       token,
       device,
       platform_version,
-      app_version
+      app_version,
     });
 
     return res.status(204).send();
   } catch (error) {
     console.error(error);
-    return res.status(500).json({message : "Failed to update"});
+    return res.status(500).json({ message: "Failed to update" });
   }
 }
 

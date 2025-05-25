@@ -11,16 +11,21 @@ const {
 
 const EMAIL_ACCOUNT = process.env.EMAIL_ACCOUNT;
 
-async function sendConfirmationCode(email ) {
+async function sendConfirmationCode(email) {
   if (!email) {
-    throw new Error('[codeEmail.service.js]:sendConfirmationCode No recipient email provided');
+    throw new Error(
+      "[codeEmail.service.js]:sendConfirmationCode No recipient email provided"
+    );
   }
   if (getCode(email)) {
-    throw new Error('A code was already sent to this email. Please wait or verify it.');
+    throw new Error(
+      "A code was already sent to this email. Please wait or verify it."
+    );
   }
   function generateAlphanumericCode(length = 6) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let code = '';
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let code = "";
     for (let i = 0; i < length; i++) {
       code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
@@ -32,7 +37,7 @@ async function sendConfirmationCode(email ) {
     code = generateAlphanumericCode(6);
     attempts++;
     if (attempts > 10) {
-      throw new Error('Unable to generate unique confirmation code');
+      throw new Error("Unable to generate unique confirmation code");
     }
   } while (hasCode(code));
 
@@ -44,12 +49,11 @@ async function sendConfirmationCode(email ) {
     subject: "Your confirmation code",
     text: `Your confirmation code is: ${code}`,
   });
-  if (process.env.ENVIROMENT == 'development') {
+  if (process.env.ENVIROMENT == "development") {
     console.debug(`[DEBUG] Confirmation code for ${email}: ${code}`);
   }
   return true;
 }
-
 
 /**
  * Check if the confirmation code sent by email is valid & delete the code.
@@ -61,7 +65,7 @@ async function sendConfirmationCode(email ) {
  * @see deleteCode
  */
 function verifyConfirmationCode(email, code) {
-  if (process.env.ENVIROMENT == 'development') {
+  if (process.env.ENVIROMENT == "development") {
     console.debug(`[DEBUG] Verifying code for ${email}: ${code}`);
   }
   const stored = getCode(email);

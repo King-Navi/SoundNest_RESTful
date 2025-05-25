@@ -1,4 +1,4 @@
-const { loginService } = require('../service/login.service');
+const { loginService } = require("../service/login.service");
 
 const loginUser = async (req, res) => {
   const { username, password } = req.body;
@@ -12,5 +12,5 @@ const loginUser = async (req, res) => {
 };
 
 module.exports = {
-  loginUser
+  loginUser,
 };

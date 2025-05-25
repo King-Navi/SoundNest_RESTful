@@ -1,4 +1,4 @@
-const Joi = require('joi');
+const Joi = require("joi");
 
 function validateParams(schema) {
   return (req, res, next) => {
@@ -11,10 +11,10 @@ function validateParams(schema) {
 }
 
 const idParamSchema = Joi.object({
-  idAppUser: Joi.number().integer().positive().required()
+  idAppUser: Joi.number().integer().positive().required(),
 });
 
 module.exports = {
   validateParams,
-  idParamSchema
+  idParamSchema,
 };

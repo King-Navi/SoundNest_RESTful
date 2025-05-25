@@ -1,26 +1,26 @@
 const { zonedTimeToUtc, utcToZonedTime } = require("date-fns-tz");
 const { format } = require("date-fns");
-const {NonexistentVisualization} = require("./exceptions/exceptions")
+const { NonexistentVisualization } = require("./exceptions/exceptions");
 const visualizationRepo = require("../repositories/visualization.repository");
 
 /**
  * Increases the play count for a song during the current month.
- * 
+ *
  * This function uses the 'America/Mexico_City' timezone to determine
  * the current month and year. If a visualization record already exists
  * for the given song and the current month, it increments its play count by 1.
  * Otherwise, it creates a new record with playCount set to 1.
- * 
+ *
  * @param {number} idSong - The ID of the song whose play count should be incremented.
  * @returns {Promise<void>} Resolves when the operation completes.
- * 
+ *
  * @throws {Error} If idSong is invalid or missing.
- * 
+ *
  * @example
  * // Assuming it's May 2025 and no record exists:
  * await increasePlayCountForSong(42);
  * // → Creates: { idSong: 42, playCount: 1, period: '2025-05-01' }
- * 
+ *
  * // Calling again in the same month:
  * await increasePlayCountForSong(42);
  * // → Updates existing visualization: playCount becomes 2
@@ -33,7 +33,11 @@ async function increasePlayCountForSong(idSong) {
   const year = now.getFullYear();
   const month = now.getMonth() + 1;
 
-  const existing = await visualizationRepo.getBySongAndPeriodMonthYear(idSong, month, year);
+  const existing = await visualizationRepo.getBySongAndPeriodMonthYear(
+    idSong,
+    month,
+    year
+  );
 
   if (existing) {
     await visualizationRepo.incrementPlayCountById(existing.idVisualizations);
@@ -43,11 +47,16 @@ async function increasePlayCountForSong(idSong) {
   }
 }
 
-
 async function getVisualizationBySongAndPeriod(idSong, month, year) {
-  const result = await visualizationRepo.getBySongAndPeriodMonthYear(idSong, month, year);
+  const result = await visualizationRepo.getBySongAndPeriodMonthYear(
+    idSong,
+    month,
+    year
+  );
   if (!result) {
-    throw new NonexistentVisualization(`No visualization found for song ${idSong} in ${month}/${year}`);
+    throw new NonexistentVisualization(
+      `No visualization found for song ${idSong} in ${month}/${year}`
+    );
   }
   return result;
 }

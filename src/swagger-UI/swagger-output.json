@@ -573,32 +573,24 @@
         "description": "Allows the authenticated user to update their password using a verification code sent to their email. The email must match the one in the JWT token.",
         "parameters": [
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "Authorization",
-            "in": "header",
-            "required": true,
-            "type": "string",
-            "description": "Bearer token (JWT) for user authentication"
-          },
-          {
             "name": "body",
             "in": "body",
-            "description": "Verification code and new password to update the current password",
             "required": true,
+            "description": "Email, confirmation code, and new password",
             "schema": {
               "type": "object",
               "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "user@example.com"
+                },
                 "code": {
                   "type": "string",
                   "example": "a1B2c3"
                 },
                 "newPassword": {
                   "type": "string",
-                  "example": "MyNewStrongPassword456"
+                  "example": "MySecurePass123"
                 }
               }
             }
@@ -609,94 +601,13 @@
             "description": "No Content"
           },
           "400": {
-            "description": "Invalid code or validation error",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "error": {
-                  "type": "string",
-                  "example": "Invalid code"
-                }
-              },
-              "xml": {
-                "name": "main"
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized - missing or invalid JWT",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "message": {
-                  "type": "string",
-                  "example": "No token provided"
-                }
-              },
-              "xml": {
-                "name": "main"
-              }
-            }
-          },
-          "403": {
-            "description": "The email in the token does not match the body email",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "error": {
-                  "type": "string",
-                  "example": "Email does not match token"
-                }
-              },
-              "xml": {
-                "name": "main"
-              }
-            }
+            "description": "Bad Request"
           },
           "404": {
-            "description": "User not found",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "error": {
-                  "type": "string",
-                  "example": "User not found"
-                }
-              },
-              "xml": {
-                "name": "main"
-              }
-            }
-          },
-          "428": {
-            "description": "Precondition Required - the code has expired or was never sent",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "error": {
-                  "type": "string",
-                  "example": "Code expired or not found"
-                }
-              },
-              "xml": {
-                "name": "main"
-              }
-            }
+            "description": "Not Found"
           },
           "500": {
-            "description": "Server error while trying to update password",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "error": {
-                  "type": "string",
-                  "example": "Failed to update password"
-                }
-              },
-              "xml": {
-                "name": "main"
-              }
-            }
+            "description": "Internal Server Error"
           }
         }
       }
@@ -1206,6 +1117,78 @@
         }
       }
     },
+    "/api/comment/responses/flat/{id}": {
+      "get": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Obtener todas las respuestas planas de un comentario",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID del comentario raíz (ej: 681457a757562da3002c02d6)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de respuestas en un solo nivel (planas)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "example": "681f473536ee5347ec38543d"
+                  },
+                  "song_id": {
+                    "type": "number",
+                    "example": 213
+                  },
+                  "author_id": {
+                    "type": "number",
+                    "example": 3
+                  },
+                  "user": {
+                    "type": "string",
+                    "example": "Ana"
+                  },
+                  "message": {
+                    "type": "string",
+                    "example": "Estoy de acuerdo!"
+                  },
+                  "timestamp": {
+                    "type": "string",
+                    "example": "2025-05-24T12:00:00.000Z"
+                  },
+                  "parent_id": {
+                    "type": "string",
+                    "example": "681f473536ee5347ec38543c"
+                  },
+                  "__v": {
+                    "type": "number",
+                    "example": 0
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "No se encontraron respuestas para este comentario"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      }
+    },
     "/api/notifications/createNotification": {
       "post": {
         "tags": [
@@ -1708,7 +1691,7 @@
       }
     },
     "/api/songs/list/get": {
-      "get": {
+      "post": {
         "tags": [
           "Songs"
         ],
@@ -2014,6 +1997,67 @@
                 "name": "main"
               }
             }
+          }
+        }
+      }
+    },
+    "/api/songs/:idsong/base64/image": {
+      "patch": {
+        "tags": [
+          "Songs"
+        ],
+        "summary": "Upload or update an image for a song via base64 string",
+        "description": "Allows a user to upload or replace the image associated with a song using a base64-encoded image string. Only the owner of the song or an admin can perform this action.",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "idsong",
+            "in": "path",
+            "description": "ID of the song whose image will be updated",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "imageBase64",
+            "in": "body",
+            "description": "Base64-encoded image string (must include data:image/jpeg;base64,... or data:image/png;base64,...)",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "imageBase64": {
+                  "type": "string",
+                  "example": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD..."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -4007,6 +4051,263 @@
                 "error": {
                   "type": "string",
                   "example": "Failed to process image upload"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/playlist/base64/upload": {
+      "put": {
+        "tags": [
+          "Playlists"
+        ],
+        "summary": "Crear una nueva playlist con imagen en formato Base64",
+        "description": "Permite a un usuario autenticado crear una nueva playlist enviando la imagen codificada en Base64. La imagen debe estar en formato PNG o JPG y debe incluir el encabezado MIME. El nombre de la playlist es obligatorio. La imagen se guarda en el servidor y se registra en la base de datos.",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "Bearer token JWT para autenticar al usuario"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "playlistName": {
+                  "type": "string",
+                  "example": "Nombre de la playlist"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "Descripción opcional"
+                },
+                "imageBase64": {
+                  "type": "string",
+                  "example": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD..."
+                }
+              },
+              "required": [
+                "playlistName",
+                "imageBase64"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Playlist creada correctamente con imagen en base64",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Playlist created successfully"
+                },
+                "playlist": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "string",
+                      "example": "68267d8ec27bdad6076766f8"
+                    },
+                    "creator_id": {
+                      "type": "number",
+                      "example": 3
+                    },
+                    "playlist_name": {
+                      "type": "string",
+                      "example": "Nombre de prueba"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "Descripción"
+                    },
+                    "image_path": {
+                      "type": "string",
+                      "example": "2025-05-22-uuid.jpeg"
+                    },
+                    "songs": {
+                      "type": "array",
+                      "example": [],
+                      "items": {}
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "example": "2025-05-22T17:30:00.000Z"
+                    },
+                    "__v": {
+                      "type": "number",
+                      "example": 0
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Falta algún campo obligatorio o imagen Base64 inválida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Invalid image base64 format"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Token no proporcionado",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "No token provided"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "403": {
+            "description": "Token inválido o expirado",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Invalid or expired token"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor al guardar la imagen",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Failed to save image from base64"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/visit/users/:idUser/stats": {
+      "get": {
+        "tags": [
+          "Visualizations"
+        ],
+        "summary": "Get total plays and top song for a user",
+        "description": "Returns the total number of plays of all songs of a user, the name of the most played song, and its play count.",
+        "parameters": [
+          {
+            "name": "idUser",
+            "in": "path",
+            "description": "ID of the user",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User statistics retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "totalPlays": {
+                  "type": "number",
+                  "example": 100
+                },
+                "topSongName": {
+                  "type": "string",
+                  "example": "Song Title"
+                },
+                "playCount": {
+                  "type": "number",
+                  "example": 50
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid user ID",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Invalid user ID"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "User not found or no songs",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "No statistics found for user ..."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Error message"
                 }
               },
               "xml": {

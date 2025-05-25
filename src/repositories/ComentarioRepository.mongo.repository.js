@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
-const { Comment } = require('../modelsMongo/comment');
-const { ValidationError } = require('sequelize');
+const mongoose = require("mongoose");
+const { Comment } = require("../modelsMongo/comment");
+const { ValidationError } = require("sequelize");
 
 class CommentRepository {
   async createComment(songId, user, message, userId) {
@@ -15,9 +15,11 @@ class CommentRepository {
       await comentario.save();
       return comentario;
     } catch (error) {
-      if (error.name === 'ValidationError') {
+      if (error.name === "ValidationError") {
         for (let field in error.errors) {
-          throw ValidationError(`Error in field "${field}": ${error.errors[field].message}`);
+          throw ValidationError(
+            `Error in field "${field}": ${error.errors[field].message}`
+          );
         }
       } else {
         throw error;
@@ -30,47 +32,60 @@ class CommentRepository {
       {
         $match: {
           song_id: songId,
-          parent_id: null // solo comentarios raíz
-        }
+          parent_id: null,
+        },
       },
       {
         $graphLookup: {
-          from: 'comments',          // colección objetivo
-          startWith: '$_id',         // desde cada comentario raíz
-          connectFromField: '_id',   // campo propio
-          connectToField: 'parent_id', // conecta con este campo de hijos
-          as: 'all_responses',       // el resultado se guarda aquí
-          depthField: 'depth'        // opcional: indica profundidad
-        }
+          from: "comments",
+          startWith: "$_id",
+          connectFromField: "_id",
+          connectToField: "parent_id",
+          as: "all_responses",
+          depthField: "depth",
+        },
       },
       {
-        $sort: { timestamp: -1 } //más recientes primero
-      }
+        $sort: { timestamp: -1 },
+      },
     ]);
-  
+
     return comentarios;
   }
-  
 
+  /**
+   * Retrieves a specific comment by its ID, along with all its child replies (and nested descendants),
+   * using MongoDB `$graphLookup` to build a flat list of replies.
+   *
+   * This method does NOT build a hierarchical structure (that is done by `buildResponseTree` in the service).
+   *
+   * @param {string|ObjectId} commentId - The ID of the comment to retrieve.
+   * @returns {Promise<Object|null>} The comment with an additional `all_responses` field,
+   *                                 containing its descendant replies in a flat format.
+   *
+   * @example
+   * const comment = await repo.getCommentById("66504b9f1138f2d8c4d7ab9a");
+   * console.log(comment.all_responses); // → [{...}, {...}, {...}]
+   */
   async getCommentById(commentId) {
     const [comentario] = await Comment.aggregate([
       {
         $match: {
-          _id: new mongoose.Types.ObjectId(commentId)
-        }
+          _id: new mongoose.Types.ObjectId(commentId),
+        },
       },
       {
         $graphLookup: {
-          from: 'comments',
-          startWith: '$_id',
-          connectFromField: '_id',
-          connectToField: 'parent_id',
-          as: 'all_responses',
-          depthField: 'depth'
-        }
-      }
+          from: "comments",
+          startWith: "$_id",
+          connectFromField: "_id",
+          connectToField: "parent_id",
+          as: "all_responses",
+          depthField: "depth",
+        },
+      },
     ]);
-  
+
     return comentario || null;
   }
 
@@ -79,21 +94,61 @@ class CommentRepository {
   }
 
   async addResponseToComment(parentCommentId, user, message, userId) {
-  const parentComment = await Comment.findById(parentCommentId);
-  if (!parentComment) {
-    throw new Error('Comentario padre no encontrado');
+    const parentComment = await Comment.findById(parentCommentId);
+    if (!parentComment) {
+      throw new Error("Comentario padre no encontrado");
+    }
+
+    const respuesta = new Comment({
+      song_id: parentComment.song_id,
+      author_id: userId,
+      user,
+      message,
+      parent_id: parentCommentId,
+    });
+
+    await respuesta.save();
+    return respuesta;
   }
 
-  const respuesta = new Comment({
-    song_id: parentComment.song_id,
-    author_id: userId, 
-    user,
-    message,
-    parent_id: parentCommentId
-  });
+  /**
+   * Retrieves all replies associated with a comment, regardless of their hierarchical level,
+   * and returns them as a flat (non-nested) list.
+   *
+   * Useful for "moderation" views or "full response lists" where hierarchy is not relevant.
+   *
+   * @param {string|ObjectId} commentId - The ID of the root comment from which to fetch all replies.
+   * @returns {Promise<Array<Object>>} Array of all child comments (direct, indirect, etc.).
+   *
+   * @example
+   * const responses = await repo.getFlatResponsesByCommentId("66504b9f1138f2d8c4d7ab9a");
+   * console.log(responses); // → [{...}, {...}, {...}]
+   */
+  async getFlatResponsesByCommentId(commentId) {
+    const [result] = await Comment.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(commentId),
+        },
+      },
+      {
+        $graphLookup: {
+          from: "comments",
+          startWith: "$_id",
+          connectFromField: "_id",
+          connectToField: "parent_id",
+          as: "all_responses",
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          all_responses: 1,
+        },
+      },
+    ]);
 
-  await respuesta.save();
-  return respuesta;
+    return result?.all_responses || [];
   }
 
   async deleteComment(commentId) {
@@ -110,5 +165,4 @@ class CommentRepository {
   }
 }
 
-module.exports = CommentRepository
-
+module.exports = CommentRepository;

@@ -1,15 +1,18 @@
 const express = require("express");
 const router = express.Router();
-const commentController = require('../controllers/comment.controller');
-const { validateNewComment } = require("../middlewares/validateNewComment.middleware");
-const { validateResponseSchema } = require("../middlewares/validateNewCommentResponse.middlware");
+const commentController = require("../controllers/comment.controller");
+const {
+  validateNewComment,
+} = require("../middlewares/validateNewComment.middleware");
+const {
+  validateResponseSchema,
+} = require("../middlewares/validateNewCommentResponse.middlware");
 const authorization = require("../middlewares/auth.middleware");
 
-const COMMENT_BASIC_ROUTE = "/api/comment"
-
+const COMMENT_BASIC_ROUTE = "/api/comment";
 
 router.post(
-/*
+  /*
 #swagger.path = '/api/comment/:commentId/respondComment'
 #swagger.tags = ['Comments']
 #swagger.summary = 'Responder a un comentario existente'
@@ -37,15 +40,14 @@ router.post(
 #swagger.responses[404] = { description: 'Comentario no encontrado' }
 #swagger.responses[500] = { description: 'Error del servidor' }
 */
-    `${COMMENT_BASIC_ROUTE}/:commentId/respondComment`,
-    authorization, 
-    validateResponseSchema , 
-    commentController.addResponseToComment
+  `${COMMENT_BASIC_ROUTE}/:commentId/respondComment`,
+  authorization,
+  validateResponseSchema,
+  commentController.addResponseToComment
 );
 
-
 router.post(
-/*
+  /*
 #swagger.path = '/api/comment/createComment'
 #swagger.tags = ['Comments']
 #swagger.summary = 'Crear un comentario'
@@ -67,14 +69,14 @@ router.post(
 #swagger.responses[404] = { description: 'Nonexistent song' }
 #swagger.responses[500] = { description: 'Error del servidor' }
 */
-    `${COMMENT_BASIC_ROUTE}/createComment`,
-    authorization,
-    validateNewComment,
-    commentController.createComment
+  `${COMMENT_BASIC_ROUTE}/createComment`,
+  authorization,
+  validateNewComment,
+  commentController.createComment
 );
 
 router.get(
-/*
+  /*
     #swagger.path = '/api/comment/getComment/:song_id/song'
     #swagger.tags = ['Comments']
     #swagger.summary = 'Obtener comentarios por ID de canción'
@@ -100,12 +102,12 @@ router.get(
     #swagger.responses[404] = { description: 'No se encontraron comentarios' }
     #swagger.responses[500] = { description: 'Error del servidor' }
     */
-    `${COMMENT_BASIC_ROUTE}/getComment/:song_id/song`, 
-    commentController.getCommentsBySong
+  `${COMMENT_BASIC_ROUTE}/getComment/:song_id/song`,
+  commentController.getCommentsBySong
 );
 
 router.get(
-    /*
+  /*
     #swagger.path = '/api/comment/:id/all'
     #swagger.tags = ['Comments']
     #swagger.summary = 'Obtener comentario por ID'
@@ -131,12 +133,12 @@ router.get(
     #swagger.responses[404] = { description: 'Comentario no encontrado' }
     #swagger.responses[500] = { description: 'Error del servidor' }
     */
-    `${COMMENT_BASIC_ROUTE}/:id/all`,
-    commentController.getCommentById
+  `${COMMENT_BASIC_ROUTE}/:id/all`,
+  commentController.getCommentById
 );
 
 router.delete(
-/*
+  /*
 #swagger.path = '/api/comment/delete/:id'
 #swagger.tags = ['Comments']
 #swagger.summary = 'Eliminar comentario por ID'
@@ -150,9 +152,40 @@ router.delete(
 #swagger.responses[404] = { description: 'Lack of permissions'}
 #swagger.responses[500] = { description: 'Error del servidor' }
 */
-    `${COMMENT_BASIC_ROUTE}/delete/:id`,
-    authorization, 
-    commentController.deleteCommentController
+  `${COMMENT_BASIC_ROUTE}/delete/:id`,
+  authorization,
+  commentController.deleteCommentController
+);
+
+router.get(
+  /*
+#swagger.path = '/api/comment/responses/flat/{id}'
+#swagger.tags = ['Comments']
+#swagger.summary = 'Obtener todas las respuestas planas de un comentario'
+#swagger.parameters['id'] = {
+    in: 'path',
+    description: 'ID del comentario raíz (ej: 681457a757562da3002c02d6)',
+    required: true,
+    type: 'string'
+}
+#swagger.responses[200] = {
+    description: 'Lista de respuestas en un solo nivel (planas)',
+    schema: [{
+        _id: '681f473536ee5347ec38543d',
+        song_id: 213,
+        author_id: 3,
+        user: 'Ana',
+        message: 'Estoy de acuerdo!',
+        timestamp: '2025-05-24T12:00:00.000Z',
+        parent_id: '681f473536ee5347ec38543c',
+        __v: 0
+    }]
+}
+#swagger.responses[404] = { description: 'No se encontraron respuestas para este comentario' }
+#swagger.responses[500] = { description: 'Error del servidor' }
+*/
+  `${COMMENT_BASIC_ROUTE}/responses/flat/:id/`,
+  commentController.getFlatResponsesFromComment
 );
 
 module.exports = router;

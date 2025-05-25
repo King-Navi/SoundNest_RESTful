@@ -28,12 +28,14 @@ async function validateSongId(req, res, next) {
     next();
   } catch (err) {
     if (err instanceof NotFoundError) {
-      return res.status(400).json({ error: "ID de canción inválido (formato)" });
+      return res
+        .status(400)
+        .json({ error: "ID de canción inválido (formato)" });
     }
     return res
       .status(500)
       .json({ error: "Error interno al validar ID de canción" });
   }
-};
+}
 
 module.exports = validateSongId;

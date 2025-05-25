@@ -1,4 +1,4 @@
-const { SongDescription } = require('../modelsMongo/songDescription');
+const { SongDescription } = require("../modelsMongo/songDescription");
 
 class SongDescriptionRepository {
   async create(data) {
@@ -13,7 +13,7 @@ class SongDescriptionRepository {
   /**
    * Updates only the 'description' field for the given song.
    *
-   * @param {number} songs_id       – ID de la canción a la que pertenece la descripción.
+   * @param {number} songs_id – ID de la canción a la que pertenece la descripción.
    * @param {string} newDescription – La nueva descripción.
    * @returns {Promise<Object|null>} – El documento actualizado, o null si no existía.
    */

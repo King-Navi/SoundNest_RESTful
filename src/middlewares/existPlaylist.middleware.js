@@ -1,5 +1,5 @@
-const PlaylistRepository  = require('../repositories/playlist.mongo.repository');
-const { NonexistentPlaylist } = require('../service/exceptions/exceptions');
+const PlaylistRepository = require("../repositories/playlist.mongo.repository");
+const { NonexistentPlaylist } = require("../service/exceptions/exceptions");
 
 const playlistRepo = new PlaylistRepository();
 
@@ -19,8 +19,8 @@ async function validatePlaylistExists(req, res, next) {
     req.playlist = playlist;
     next();
   } catch (err) {
-    console.log(err)
-    return res.status(500).json({ error: "Error al validar el id"});
+    console.log(err);
+    return res.status(500).json({ error: "Error al validar el id" });
   }
 }
 
