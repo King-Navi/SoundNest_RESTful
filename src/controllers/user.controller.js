@@ -86,13 +86,14 @@ async function sendCode(req, res) {
     await codeService.sendConfirmationCode(email);
     res.status(200).json({ message: "Code sent successfully" });
   } catch (err) {
+    if (err instanceof EmailAlreadySend) {
+      return res.status(400).json({ error: err.message });
+    }
     if (err instanceof HttpError) {
       return res.status(err.statusCode).json({ error: err.message });
     }
 
-    if (err instanceof EmailAlreadySend) {
-      return res.status(400).json({ error: err.message });
-    }
+    
     console.error(`[${NAME_FILE}][sendCode] Error:, ${err}`);
 
     res.status(500).json({ error: "Failed to send code" });

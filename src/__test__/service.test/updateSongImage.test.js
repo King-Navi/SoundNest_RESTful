@@ -2,7 +2,7 @@ jest.mock("../../repositories/song.repository", () => ({
   getSongById: jest.fn(),
 }));
 jest.mock("../../repositories/songPhoto.repository", () => ({
-  getBySongId: jest.fn(),
+  getBySongPhotoId: jest.fn(),
   update: jest.fn(),
   create: jest.fn(),
 }));
@@ -25,6 +25,10 @@ describe("updateSongImage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     process.env.SONGS_IMAGE_PATH_JS = "/final/images";
+    fs.access = jest.fn().mockResolvedValue();
+    fs.rename = jest.fn().mockResolvedValue();
+    fs.rm = jest.fn().mockResolvedValue();
+    fs.mkdir = jest.fn().mockResolvedValue();
   });
 
   test("debe lanzar error si el archivo no tiene extensión", async () => {
@@ -43,14 +47,14 @@ describe("updateSongImage", () => {
 
   test("debe crear nueva imagen si no existe", async () => {
     SongRepository.getSongById.mockResolvedValue({ idSong: songId });
-    SongPhotoRepository.getBySongId.mockResolvedValue(null);
+    SongPhotoRepository.getBySongPhotoId.mockResolvedValue(null);
 
     await updateSongImage(songId, fileName, tmpDirPath);
 
     expect(SongPhotoRepository.create).toHaveBeenCalledWith(
       baseExpectedFinalName,
       extension,
-      songId,
+      songId
     );
 
     expect(fs.rename).toHaveBeenCalledWith(
@@ -66,7 +70,9 @@ describe("updateSongImage", () => {
 
   test("debe actualizar imagen existente si ya hay una", async () => {
     SongRepository.getSongById.mockResolvedValue({ idSong: songId });
-    SongPhotoRepository.getBySongId.mockResolvedValue({ idSongPhoto: 999 });
+    SongPhotoRepository.getBySongPhotoId.mockResolvedValue({
+      idSongPhoto: 999,
+    });
 
     await updateSongImage(songId, fileName, tmpDirPath);
 

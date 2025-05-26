@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
 const ConfirmationReasons = require("../utils/enums/confirmationReasons");
 const transporter = require("../config/emailConfig");
+const { EmailAlreadySend } = require("../service/exceptions/exceptions");
 
 const {
   setCode,
@@ -18,7 +19,7 @@ async function sendConfirmationCode(email) {
     );
   }
   if (getCode(email)) {
-    throw new Error(
+    throw new EmailAlreadySend(
       "A code was already sent to this email. Please wait or verify it."
     );
   }
