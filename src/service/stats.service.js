@@ -1,6 +1,9 @@
 const {
   getTotalPlaysByUser,
   getMostPlayedSongByUser,
+  getTopSongsByUser,
+  getTopGlobalSongs,
+  getTopGlobalGenres,
 } = require("../repositories/stats.repository");
 
 /**
@@ -22,6 +25,30 @@ async function getUserSongStats(userId) {
   };
 }
 
+async function getTopSongsByUserService(userId, limit) {
+  if (!userId || !limit) {
+    throw new Error("User ID and limit are required");
+  }
+  return await getTopSongsByUser(userId, limit);
+}
+
+async function getTopGlobalSongsService(limit) {
+  if (!limit) {
+    throw new Error("Limit is required");
+  }
+  return await getTopGlobalSongs(limit);
+}
+
+async function getTopGlobalGenresService(limit) {
+  if (!limit) {
+    throw new Error("Limit is required");
+  }
+  return await getTopGlobalGenres(limit);
+}
+
 module.exports = {
   getUserSongStats,
+  getTopSongsByUserService,
+  getTopGlobalSongsService,
+  getTopGlobalGenresService
 };

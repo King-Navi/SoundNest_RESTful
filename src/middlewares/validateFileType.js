@@ -9,7 +9,7 @@ const fs = require("fs");
  * - If validation passes, the request proceeds to the next middleware.
  */
 async function validateFileType(req, res, next) {
-  if (!req.file || !req.file.path) {
+  if (!req.file?.path) {
     return res.status(400).json({ error: "File not provided" });
   }
 
@@ -17,7 +17,7 @@ async function validateFileType(req, res, next) {
     const type = await fileType.fileTypeFromFile(req.file.path);
 
     if (!type || !["image/jpeg", "image/png"].includes(type.mime)) {
-      await await fs.promises.unlink(req.file.path);
+      await fs.promises.unlink(req.file.path);
 
       return res
         .status(400)

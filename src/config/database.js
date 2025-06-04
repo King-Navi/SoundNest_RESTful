@@ -33,7 +33,7 @@ async function initializeDatabase() {
   try {
     await connectMongo();
   } catch (err) {
-    console.error("[database.js] MongoDB failed. Exiting...");
+    console.error("[database.js] MongoDB failed. Exiting... ", err.message );
     process.exit(1);
   }
 }

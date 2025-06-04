@@ -1,7 +1,7 @@
 const sequelize = require("../config/sequelize");
 const initModels = require("../models/init-models");
 const { Visualization, Song } = initModels(sequelize);
-
+const { QueryTypes } = require('sequelize');
 /**
  * Returns the total play count across all songs of a given user.
  * @param {number} userId
@@ -70,8 +70,79 @@ async function getUserSongStats(userId) {
   return { totalPlays, topSong };
 }
 
+/**
+ * Retrieves the N most listened songs by a specific user.
+ * @param {number} userId - The ID of the user.
+ * @param {number} limit - The number of songs to return.
+ * @returns {Promise<Array<{songName: string, totalPlayCount: number}>>} An array of objects with songName and totalPlayCount.
+ * @throws {Error} If there's an issue fetching the data.
+ */
+async function getTopSongsByUser(userId, limit) {
+    try {
+        const [results] = await sequelize.query(
+            'CALL GetTopSongsByUser(:idUser, :pLimit)',
+            {
+                replacements: { idUser: userId, pLimit: limit },
+                type: QueryTypes.RAW
+            }
+        );
+        return results;
+    } catch (error) {
+        console.error('Error fetching top N songs by user:', error);
+        throw error;
+    }
+}
+
+/**
+ * Retrieves the N most listened songs globally.
+ * @param {number} limit - The number of songs to return.
+ * @returns {Promise<Array<{songName: string, totalPlayCount: number}>>} An array of objects with songName and totalPlayCount.
+ * @throws {Error} If there's an issue fetching the data.
+ */
+async function getTopGlobalSongs(limit) {
+    try {
+        const [results] = await sequelize.query(
+            'CALL GetTopGlobalSongs(:pLimit)',
+            {
+                replacements: { pLimit: limit },
+                type: QueryTypes.RAW
+            }
+        );
+        return results;
+    } catch (error) {
+        console.error('Error fetching top N global songs:', error);
+        throw error;
+    }
+}
+
+/**
+ * Retrieves the N most listened genres globally.
+ * @param {number} limit - The number of genres to return.
+ * @returns {Promise<Array<{genreName: string, totalPlayCount: number}>>} An array of objects with genreName and totalPlayCount.
+ * @throws {Error} If there's an issue fetching the data.
+ */
+async function getTopGlobalGenres(limit) {
+    try {
+        const [results] = await sequelize.query(
+            'CALL GetTopNGlobalGenres(:pLimit)',
+            {
+                replacements: { pLimit: limit },
+                type: QueryTypes.RAW
+            }
+        );
+        return results;
+    } catch (error) {
+        console.error('Error fetching top N global genres:', error);
+        throw error;
+    }
+}
+
+
 module.exports = {
   getTotalPlaysByUser,
   getMostPlayedSongByUser,
   getUserSongStats,
+  getTopSongsByUser,
+  getTopGlobalSongs,
+  getTopGlobalGenres
 };

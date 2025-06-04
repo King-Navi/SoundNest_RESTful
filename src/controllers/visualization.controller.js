@@ -5,6 +5,12 @@ const {
   NonexistentVisualization,
 } = require("../service/exceptions/exceptions");
 
+const{
+ getTopGlobalGenresService,
+ getTopSongsByUserService,
+ getTopGlobalSongsService
+} = require ("../service/stats.service")
+
 async function incrementPlayCount(req, res) {
   const { idSong } = req.song;
   try {
@@ -66,9 +72,53 @@ async function getTopSongsVisits(req, res) {
   }
 }
 
+
+
+async function getTopSongsByUserController (req, res) {
+    try {
+        const userId = parseInt(req.params.idUser);
+        const limit = parseInt(req.query.limit || 10);
+
+        const topSongs = await getTopSongsByUserService(userId, limit);
+        res.status(200).json(topSongs);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to get top songs by user.' });
+    }
+};
+
+async function getTopGlobalSongsController (req, res) {
+    try {
+        const limit = parseInt(req.query.limit || 10);
+
+        const topSongs = await getTopGlobalSongsService(limit);
+        res.status(200).json(topSongs);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to get top global songs.' });
+    }
+};
+
+async function getTopGlobalGenresController (req, res){
+    try {
+        const limit = parseInt(req.query.limit || 10);
+
+        const topGenres = await getTopGlobalGenresService(limit);
+        res.status(200).json(topGenres);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to get top global genres.' });
+    }
+};
+
+
+
 module.exports = {
   incrementPlayCount,
   getVisualizationByPeriod,
   listVisualizationsBySong,
   getTopSongsVisits,
+  getTopGlobalGenresController,
+  getTopGlobalSongsController,
+  getTopSongsByUserController
 };

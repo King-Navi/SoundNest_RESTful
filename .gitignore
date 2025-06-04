@@ -34,3 +34,6 @@ out/
 
 uploads/
 uploads
+
+# .gitignore
+.scannerwork/

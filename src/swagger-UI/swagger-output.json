@@ -4352,7 +4352,7 @@
         }
       }
     },
-    "/api/visit/top/:year/:month": {
+    "/api/visit/topVisualization/:year/:month": {
       "get": {
         "tags": [
           "Visualizations"
@@ -4419,7 +4419,7 @@
         }
       }
     },
-    "/api/visit/:idsong/:year/:month": {
+    "/api/visit/song/:idsong/:year/:month": {
       "get": {
         "tags": [
           "Visualizations"
@@ -4531,7 +4531,7 @@
         }
       }
     },
-    "/api/visit/:idsong": {
+    "/api/visit/song/:idsong": {
       "get": {
         "tags": [
           "Visualizations"
@@ -4618,6 +4618,154 @@
                 "name": "main"
               }
             }
+          }
+        }
+      }
+    },
+    "/api/visit/user/:idUser/top-songs": {
+      "get": {
+        "tags": [
+          "Visualizations"
+        ],
+        "summary": "Get top N songs for a user",
+        "description": "Returns an array of the user’s top N most listened songs, ordered by play count.",
+        "parameters": [
+          {
+            "name": "idUser",
+            "in": "path",
+            "description": "ID of the user",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of songs to return (default: 10)",
+            "required": false,
+            "type": "integer",
+            "default": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Top songs retrieved successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "songName": {
+                    "type": "string",
+                    "example": "Song Title B"
+                  },
+                  "totalPlayCount": {
+                    "type": "number",
+                    "example": 90
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/visit/global/top-songs": {
+      "get": {
+        "tags": [
+          "Visualizations"
+        ],
+        "summary": "Get top N songs globally",
+        "description": "Returns an array of the globally most listened songs, ordered by total play count.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of songs to return (default: 10)",
+            "required": false,
+            "type": "integer",
+            "default": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Top global songs retrieved successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "songName": {
+                    "type": "string",
+                    "example": "Global Hit 2"
+                  },
+                  "totalPlayCount": {
+                    "type": "number",
+                    "example": 1800
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/visit/global/top-genres": {
+      "get": {
+        "tags": [
+          "Visualizations"
+        ],
+        "summary": "Get top N genres globally",
+        "description": "Returns an array of the most popular genres globally, ordered by total play count.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of genres to return (default: 10)",
+            "required": false,
+            "type": "integer",
+            "default": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Top genres retrieved successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "genreName": {
+                    "type": "string",
+                    "example": "Rock"
+                  },
+                  "totalPlayCount": {
+                    "type": "number",
+                    "example": 2800
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }

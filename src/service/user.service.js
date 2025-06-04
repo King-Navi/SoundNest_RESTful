@@ -148,17 +148,13 @@ async function getUserById(userId) {
   if (!userId) {
     throw new ValidationError("User ID is required");
   }
-  try {
-    const userInstance = await userRepository.findUserById(userId);
-    if (!userInstance) return null;
+  const userInstance = await userRepository.findUserById(userId);
+  if (!userInstance) return null;
 
-    const user = userInstance.get({ plain: true });
-    delete user.password;
+  const user = userInstance.get({ plain: true });
+  delete user.password;
 
-    return user;
-  } catch (error) {
-    throw error;
-  }
+  return user;
 }
 
 module.exports = {

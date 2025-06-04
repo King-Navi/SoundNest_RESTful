@@ -139,21 +139,17 @@ async function searchSong(
   limitSearch,
   offsetSearch
 ) {
-  try {
     const filters = {
       songName,
       artistName,
       idSongGenre: idGenre,
     };
-    pagination = {
+    const pagination = {
       limit: limitSearch,
       offset: offsetSearch,
     };
-    let queryResult = await getSongsByFilters(filters);
+    let queryResult = await getSongsByFilters(filters, pagination);
     return await formatSongList(queryResult);
-  } catch (error) {
-    throw error;
-  }
 }
 
 /**
@@ -294,7 +290,10 @@ async function formatSong(songInstance) {
   try {
     const descDoc = await songDescriptionRepo.getBySongId(data.idSong);
     if (descDoc?.description) description = descDoc.description;
-  } catch (_) {}
+  } catch (_) {
+    // Intentionally ignored: no description found is acceptable
+    console.debug(`[formatSong] Failed to get description: ${err.message}`);
+  }
 
   return {
     idSong: data.idSong,

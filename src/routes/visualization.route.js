@@ -68,7 +68,7 @@ router.post(
 router.get(
   /*
   #swagger.tags = ['Visualizations']
-    #swagger.path = '/api/visit/top/:year/:month'
+    #swagger.path = '/api/visit/topVisualization/:year/:month'
     #swagger.summary = 'Get top song IDs by plays in a month'
     #swagger.description = 'Returns an array of song IDs ordered by descending play count for the given month/year.'
     #swagger.parameters['year'] = {
@@ -98,7 +98,7 @@ router.get(
 router.get(
   /*
   #swagger.tags = ['Visualizations']
-    #swagger.path = '/api/visit/:idsong/:year/:month'
+    #swagger.path = '/api/visit/song/:idsong/:year/:month'
     #swagger.summary = 'Get visualization record for a song in a month'
     #swagger.description = 'Returns the visualization object for a given song ID and month/year.'
     #swagger.parameters['idsong'] = {
@@ -141,7 +141,7 @@ router.get(
       schema: { error: 'Error message' }
     }
   */
-  `${VISUALIZATION_BASIC_ROUTE}/:idsong/:year/:month`,
+  `${VISUALIZATION_BASIC_ROUTE}/song/:idsong/:year/:month`,
   validateSongId,
   visualizationController.getVisualizationByPeriod
 );
@@ -150,7 +150,7 @@ router.get(
   /*
   
   #swagger.tags = ['Visualizations']
-    #swagger.path = '/api/visit/:idsong'
+    #swagger.path = '/api/visit/song/:idsong'
     #swagger.summary = 'List all visualizations for a song'
     #swagger.description = 'Returns an array of all visualization records for the specified song, ordered by period.'
     #swagger.parameters['idsong'] = {
@@ -180,9 +180,96 @@ router.get(
       schema: { error: 'Error message' }
     }
   */
-  `${VISUALIZATION_BASIC_ROUTE}/:idsong`,
+  `${VISUALIZATION_BASIC_ROUTE}/song/:idsong(\\d+)`,
   validateSongId,
   visualizationController.listVisualizationsBySong
+);
+
+router.get(
+    /*
+    #swagger.path = '/api/visit/user/:idUser/top-songs'
+    #swagger.tags = ['Visualizations']
+    #swagger.summary = 'Get top N songs for a user'
+    #swagger.description = 'Returns an array of the user’s top N most listened songs, ordered by play count.'
+
+    #swagger.parameters['idUser'] = {
+      in: 'path',
+      description: 'ID of the user',
+      required: true,
+      type: 'integer'
+    }
+
+    #swagger.parameters['limit'] = {
+      in: 'query',
+      description: 'Maximum number of songs to return (default: 10)',
+      required: false,
+      type: 'integer',
+      default: 10
+    }
+
+    #swagger.responses[200] = {
+      description: 'Top songs retrieved successfully',
+      schema: [
+        { songName: 'Song Title A', totalPlayCount: 125 },
+        { songName: 'Song Title B', totalPlayCount: 90 }
+      ]
+    }
+  */
+  `${VISUALIZATION_BASIC_ROUTE}/user/:idUser/top-songs`,
+  validateUserIdParam,
+  visualizationController.getTopSongsByUserController
+);
+router.get(
+  /*
+    #swagger.path = '/api/visit/global/top-songs'
+    #swagger.tags = ['Visualizations']
+    #swagger.summary = 'Get top N songs globally'
+    #swagger.description = 'Returns an array of the globally most listened songs, ordered by total play count.'
+
+    #swagger.parameters['limit'] = {
+      in: 'query',
+      description: 'Maximum number of songs to return (default: 10)',
+      required: false,
+      type: 'integer',
+      default: 10
+    }
+
+    #swagger.responses[200] = {
+      description: 'Top global songs retrieved successfully',
+      schema: [
+        { songName: 'Global Hit 1', totalPlayCount: 2000 },
+        { songName: 'Global Hit 2', totalPlayCount: 1800 }
+      ]
+    }
+  */
+  `${VISUALIZATION_BASIC_ROUTE}/global/top-songs`,
+  visualizationController.getTopGlobalSongsController
+);
+router.get(
+  /*
+    #swagger.path = '/api/visit/global/top-genres'
+    #swagger.tags = ['Visualizations']
+    #swagger.summary = 'Get top N genres globally'
+    #swagger.description = 'Returns an array of the most popular genres globally, ordered by total play count.'
+
+    #swagger.parameters['limit'] = {
+      in: 'query',
+      description: 'Maximum number of genres to return (default: 10)',
+      required: false,
+      type: 'integer',
+      default: 10
+    }
+
+    #swagger.responses[200] = {
+      description: 'Top genres retrieved successfully',
+      schema: [
+        { genreName: 'Pop', totalPlayCount: 3500 },
+        { genreName: 'Rock', totalPlayCount: 2800 }
+      ]
+    }
+  */
+  `${VISUALIZATION_BASIC_ROUTE}/global/top-genres`,
+  visualizationController.getTopGlobalGenresController
 );
 
 module.exports = router;
