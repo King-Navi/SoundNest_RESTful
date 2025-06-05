@@ -47,7 +47,6 @@ const BASE_FILE_NAME_SONG_IMAGE = "song-";
 async function updateDescriptionSongService(songId, userId, description) {
   const idSong = Number(songId);
   const idUser = Number(userId);
-  console.log(idUser);
   if (!Number.isInteger(idSong) || idSong <= 0) {
     throw new BadRequestError("Invalid songId: must be a positive integer");
   }
@@ -336,4 +335,5 @@ module.exports = {
   getListSongsByIdsService,
   updateDescriptionSongService,
   BASE_FILE_NAME_SONG_IMAGE,
+  formatSongList,
 };

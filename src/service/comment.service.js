@@ -40,7 +40,9 @@ async function getCommentById(commentId) {
     if (!rawComment) return null;
     return buildResponseTree(rawComment);
   } catch (error) {
-    console.error("Error al obtener el comentario por ID:", error);
+    if (process.env.ENVIROMENT === "development") {
+      console.error("Error al obtener el comentario por ID:", error);
+    }
     throw new Error("Error al obtener el comentario");
   }
 }
@@ -54,7 +56,9 @@ async function addResponseToComment(commentId, user, message, idUser) {
       idUser
     );
   } catch (error) {
-    console.error("Error al agregar la respuesta al comentario:", error);
+    if (process.env.ENVIROMENT === "development") {
+      console.error("Error al agregar la respuesta al comentario:", error);
+    }
     throw new Error("Error al agregar la respuesta");
   }
 }
@@ -63,7 +67,9 @@ async function deleteComment(commentId) {
   try {
     return await commentRepository.deleteComment(commentId);
   } catch (error) {
-    console.error("Error al eliminar el comentario:", error);
+    if (process.env.ENVIROMENT === "development") {
+      console.error("Error al eliminar el comentario:", error);
+    }
     throw new Error("Error al eliminar el comentario");
   }
 }
@@ -115,7 +121,9 @@ async function getFlatResponses(commentId) {
   try {
     return await commentRepository.getFlatResponsesByCommentId(commentId);
   } catch (error) {
-    console.error("Error al obtener respuestas planas del comentario:", error);
+    if (process.env.ENVIROMENT === "development") {
+      console.error("Error al obtener el comentario por ID:", error);
+    }
     throw new Error("Error al obtener respuestas del comentario");
   }
 }

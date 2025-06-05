@@ -79,7 +79,7 @@ async function getUserSongStats(userId) {
  */
 async function getTopSongsByUser(userId, limit) {
     try {
-        const [results] = await sequelize.query(
+        const results = await sequelize.query(
             'CALL GetTopSongsByUser(:idUser, :pLimit)',
             {
                 replacements: { idUser: userId, pLimit: limit },
@@ -101,7 +101,7 @@ async function getTopSongsByUser(userId, limit) {
  */
 async function getTopGlobalSongs(limit) {
     try {
-        const [results] = await sequelize.query(
+        const results = await sequelize.query(
             'CALL GetTopGlobalSongs(:pLimit)',
             {
                 replacements: { pLimit: limit },
@@ -123,8 +123,8 @@ async function getTopGlobalSongs(limit) {
  */
 async function getTopGlobalGenres(limit) {
     try {
-        const [results] = await sequelize.query(
-            'CALL GetTopNGlobalGenres(:pLimit)',
+        const results = await sequelize.query(
+            'CALL GetTopGlobalGenres(:pLimit)',
             {
                 replacements: { pLimit: limit },
                 type: QueryTypes.RAW

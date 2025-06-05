@@ -35,9 +35,9 @@ async function getVisualizationByPeriod(req, res) {
     res.status(200).json(result);
   } catch (err) {
     if (err instanceof NonexistentVisualization) {
-      res.status(404).json({ error: err.message });
+      return res.status(404).json({ error: err.message });
     }
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 }
 

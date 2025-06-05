@@ -23,7 +23,9 @@ class FileManager {
       await fs.move(tempPath, targetPath, { overwrite: true });
       return targetPath;
     } catch (err) {
-      console.error(`[moveTempImage] Failed to move image: ${err.message}`);
+      if (process.env.ENVIROMENT === "development") {
+        console.error(`[moveTempImage] Failed to move image: ${err.message}`);
+      }
       throw err;
     }
   }
@@ -32,14 +34,17 @@ class FileManager {
     const fullPath = path.join(this.imageDir, `${fileName}.${extension}`);
     try {
       await fs.unlink(fullPath);
-      console.log(`Imagen eliminada: ${fullPath}`);
       return true;
     } catch (err) {
       if (err.code === "ENOENT") {
-        console.warn(`Imagen no encontrada (omitido): ${fullPath}`);
+        if (process.env.ENVIROMENT === "development") {
+          console.warn(`Imagen no encontrada (omitido): ${fullPath}`);
+        }
         return false;
       }
-      console.error(`Error eliminando imagen ${fullPath}:`, err.message);
+      if (process.env.ENVIROMENT === "development") {
+        console.error(`Error eliminando imagen ${fullPath}:`, err.message);
+      }
       throw err;
     }
   }
@@ -69,14 +74,12 @@ class FileManager {
     const fileName =
       fileNameOverride || `${Date.now()}-${uuidv4()}.${extension}`;
     const fullPath = path.join(this.imageDir, fileName);
-    console.log("[FileManager] Guardando archivo base64 en:", fullPath);
     await fs.mkdir(this.imageDir, { recursive: true });
     await fs.writeFile(fullPath, base64Data, { encoding: "base64" });
     const exists = await fs
       .access(fullPath)
       .then(() => true)
       .catch(() => false);
-    console.log("[FileManager] ¿Se guardó el archivo?", exists);
     return { fileName, path: fullPath };
   }
 }
