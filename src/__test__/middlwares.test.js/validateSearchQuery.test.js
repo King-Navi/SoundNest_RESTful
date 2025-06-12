@@ -32,7 +32,6 @@ describe('searchQuerySchema (Joi)', () => {
   test('falla si no hay songName, artistName ni idGenre', () => {
     const { error } = searchQuerySchema.validate({}, opts);
     expect(error).toBeDefined();
-    // Debe incluir tu mensaje personalizado:
     expect(error.details.map(d => d.message).join()).toMatch(
       /Debes enviar al menos uno de estos parámetros/
     );

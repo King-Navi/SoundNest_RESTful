@@ -5,7 +5,7 @@ const QUEUE = "song.delete";
 /**
  * Publishes a message indicating that a song should be deleted.
  * @param {number} idSong - The ID of the song to delete.
- * @returns {Promise<void>}
+ * @returns {true}
  */
 async function publishDeleteSong(idSong) {
   if (!idSong || typeof idSong !== "number") {
@@ -23,6 +23,7 @@ async function publishDeleteSong(idSong) {
   });
 
   console.log("[Producer] Sent deleteSong message:", { idSong });
+  return true;
 }
 
 module.exports = { publishDeleteSong };
