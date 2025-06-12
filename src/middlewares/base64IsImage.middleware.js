@@ -12,7 +12,7 @@ function validateImageBase64Format(req, res, next) {
       .json({ message: "Missing or invalid imageBase64 field." });
   }
 
-  const match = imageBase64.match(/^data:image\/(png|jpeg|jpg);base64,(.+)$/);
+  const match = imageBase64.match(/^data:image\/(png|jpeg|jpg|webp|heic|heif);base64,(.+)$/);
 
   if (!match) {
     return res
@@ -32,21 +32,28 @@ function validateImageBase64Format(req, res, next) {
   } catch (e) {
     return res.status(400).json({ message: "Invalid base64 encoding." });
   }
-  const magicNumbers = {
-    png: [0x89, 0x50, 0x4e, 0x47],
-    jpg: [0xff, 0xd8, 0xff],
-    jpeg: [0xff, 0xd8, 0xff],
-  };
 
-  const expectedMagic = magicNumbers[mimeType];
-
-  if (!expectedMagic) {
-    return res.status(400).json({ message: "Unsupported image format." });
+  let isValidMagic = false;
+  switch (mimeType) {
+    case "png":
+      isValidMagic =
+        buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47;
+      break;
+    case "jpg":
+    case "jpeg":
+      isValidMagic = buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+      break;
+    case "webp":
+      isValidMagic =
+        buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46 &&
+        buffer.slice(8, 12).toString() === "WEBP";
+      break;
+    case "heic":
+    case "heif":
+      isValidMagic = buffer.slice(4, 8).toString() === "ftyp";
+      break;
   }
 
-  const isValidMagic = expectedMagic.every(
-    (byte, index) => buffer[index] === byte
-  );
 
   if (!isValidMagic) {
     return res

@@ -4,7 +4,7 @@ const playlistUploadSchema = Joi.object({
   playlistName: Joi.string().min(1).max(100).required(),
   description: Joi.string().max(500).allow("").optional(),
   imageBase64: Joi.string()
-    .pattern(/^data:image\/(png|jpeg|jpg);base64,[A-Za-z0-9+/=]+$/)
+    .pattern(/^data:image\/(png|jpeg|jpg|webp|heic|heif);base64,[A-Za-z0-9+/=]+$/)
     .required(),
 });
 

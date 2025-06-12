@@ -145,23 +145,13 @@ async function uploadPlaylistImageController(req, res) {
   try {
     const { playlistName, description } = req.body;
     const userId = req.user.id;
-    /*
-    file
-    {
-      fieldname: 'image', (por ejemplo, "image" si usaste upload.single('image'))
-      originalname: 'cover.png',  como lo subió el usuario
-      encoding: '7bit',
-      mimetype: 'image/png',
-      destination: 'uploads/playlist_image',
-      filename: '1715465678901-cover.png', Nombre del archivo generado por Multer en el servidor 
-      path: 'uploads/playlist_image/1715465678901-cover.png',
-      size: 458721
-    }
-    */
     const fileName = req._uploadedFileName;
     const tempPath = req.file.path;
     if (!fileName || !tempPath) {
       return res.status(400).json({ error: "Missing uploaded file or path" });
+    }
+    if (process.env.ENVIROMENT== "development") {
+      console.debug("[uploadPlaylistImage] fileName:", fileName, "tempPath:", tempPath);
     }
     const playlist = await createPlaylistService({
       userId,
@@ -176,7 +166,15 @@ async function uploadPlaylistImageController(req, res) {
     });
   } catch (error) {
     console.error("[uploadPlaylistImageController] Error:", error);
-    res.status(500).json({ error: "Failed to process image upload. " });
+    try {
+      const { name, ext } = require("path").parse(fileName);
+      const extension = ext.replace(".", "");
+      await require("../utils/fileManager").deleteImage(name, extension);
+    } catch (cleanupErr) {
+      console.warn("[uploadPlaylistImageController] Cleanup failed:", cleanupErr);
+    }
+
+    return res.status(500).json({ error: "Failed to process image upload." });
   }
 }
 

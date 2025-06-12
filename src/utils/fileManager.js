@@ -50,7 +50,7 @@ class FileManager {
   }
 
   async saveImageFromBase64(imageBase64) {
-    const match = imageBase64.match(/^data:image\/(png|jpeg|jpg);base64,(.+)$/);
+    const match = imageBase64.match(/^data:image\/(png|jpeg|jpg|webp|heic|heif);base64,(.+)$/);
     if (!match) {
       throw new Error("Invalid image base64 format");
     }
@@ -66,7 +66,7 @@ class FileManager {
     return { fileName, path: fullPath };
   }
   async saveImageFromBase64(imageBase64, fileNameOverride) {
-    const match = imageBase64.match(/^data:image\/(png|jpeg|jpg);base64,(.+)$/);
+    const match = imageBase64.match(/^data:image\/(png|jpeg|jpg|webp|heic|heif);base64,(.+)$/);
     if (!match) throw new Error("Invalid image base64 format");
 
     const extension = match[1];
