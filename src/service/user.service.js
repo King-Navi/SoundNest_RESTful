@@ -14,6 +14,7 @@ const ID_LISTENER = 1;
 const MAX_PASSWORD_LENGTH = 256;
 const MAX_USERNAME_LENGTH = 100;
 const MAX_EMAIL_LENGTH = 100;
+const HttpError = require("../utils/exceptions/httpError");
 
 async function getAditionalInfoUserService(id) {
   const exists = await additionalInfoRepository.hasAdditionalInformation(id);
@@ -102,6 +103,16 @@ async function updateUser(userId, updateData) {
   if ("password" in filteredData) {
     delete filteredData.password;
   }
+
+  if ("nameUser" in filteredData) {
+    const existingUser = await userRepository.findUserByName(filteredData.nameUser);
+    if (existingUser && existingUser.idUser !== userId) {
+      const error = new HttpError(409,"The username is already in use.");
+      error.status = 409;
+      throw error;
+    }
+  }
+
   let updatedUser;
 
   try {
