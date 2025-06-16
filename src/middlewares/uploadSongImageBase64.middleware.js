@@ -6,6 +6,27 @@ const songUploadSchema = Joi.object({
     .required(),
 });
 
+/**
+ * Middleware to validate the `imageBase64` field in the request body using Joi.
+ *
+ * Validation rules:
+ * - `imageBase64` must be a required string.
+ * - It must match the pattern for base64-encoded images with MIME types:
+ *   - image/png
+ *   - image/jpeg
+ *   - image/jpg
+ * - The pattern must follow the format: `data:image/<type>;base64,<data>`
+ *
+ * If validation fails:
+ * - Responds with HTTP 400 and includes Joi validation error messages.
+ *
+ * If validation succeeds:
+ * - Unknown fields are stripped from the request body.
+ * - The validated body is assigned back to `req.body`.
+ *
+ * Intended for use in routes handling song image uploads via base64 strings.
+ */
+
 function validateSongBase64(req, res, next) {
   const { error, value } = songUploadSchema.validate(req.body, {
     abortEarly: false,

@@ -20,9 +20,25 @@ const listOfSongIdsSchema = Joi.object({
 });
 
 /**
- * Middleware to validate that req.body.songIds is an array of positive integers.
- * Responds with HTTP 400 if validation fails.
+ * Middleware to validate the `songIds` field in the request body.
+ *
+ * Expected Format:
+ * - `songIds`: An array of one or more positive integers (≥ 1).
+ *
+ * Joi Validation Rules:
+ * - Each item in the array must be:
+ *   - A number
+ *   - An integer
+ *   - Positive
+ * - The array itself must:
+ *   - Exist
+ *   - Contain at least one element
+ *
+ * Error Handling:
+ * - On validation failure, responds with HTTP 400 and a specific message.
+ * - On success, the request proceeds to the next middleware or handler.
  */
+
 function validateListOfSongsId(req, res, next) {
   const { error } = listOfSongIdsSchema.validate(req.body);
   if (error) {

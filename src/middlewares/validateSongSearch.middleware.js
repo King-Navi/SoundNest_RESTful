@@ -18,6 +18,26 @@ const searchQuerySchema = Joi.object({
     "number.max": "{{#label}} debe ser menor o igual a {{#limit}}.",
   });
 
+  /**
+ * Middleware to validate search query parameters for songs.
+ * 
+ * Validates that at least one of the following query parameters is present:
+ * - songName (string, 1-100 characters)
+ * - artistName (string, 1-100 characters)
+ * - idGenre (positive integer, minimum 1)
+ * 
+ * Optional parameters with defaults:
+ * - limit (integer between 1 and 60, default 10)
+ * - offset (integer >= 0, default 0)
+ * 
+ * If validation fails, responds with HTTP 400 and a descriptive error message.
+ * On success, it sanitizes and assigns the validated query parameters back to req.query.
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ */
+
 function validateSearchQuery(req, res, next) {
   const { error, value } = searchQuerySchema.validate(req.query, {
     abortEarly: false,

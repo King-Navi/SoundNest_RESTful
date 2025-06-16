@@ -19,6 +19,18 @@ const newUserSchema = Joi.object({
   additionalInformation: Joi.string().optional(),
 });
 
+/**
+ * Middleware to validate request body when updating a user's password.
+ *
+ * Validation schema (`editPasswordUserSchema`):
+ * - `code`:        Required, alphanumeric string (2–20 characters).
+ * - `newPassword`: Required, trimmed string (1–256 characters).
+ * - `email`:       Required, valid email address.
+ *
+ * If validation fails:
+ * - Responds with HTTP 400 and the first Joi error message.
+ */
+
 function validateEditUserPassword(req, res, next) {
   const { error } = editPasswordUserSchema.validate(req.body);
   if (error) {
@@ -27,6 +39,20 @@ function validateEditUserPassword(req, res, next) {
   next();
 }
 
+/**
+ * Middleware to validate request body for editing user profile data.
+ *
+ * Validation schema (`editUserSchema`):
+ * - `nameUser`:             Optional string (max 100 characters).
+ * - `email`:                Optional, valid email address.
+ * - `additionalInformation`: Optional string.
+ *
+ * At least one field must be present (`min(1)` constraint).
+ *
+ * If validation fails:
+ * - Responds with HTTP 400 and the first Joi error message.
+ */
+
 function validateEditUser(req, res, next) {
   const { error } = editUserSchema.validate(req.body);
   if (error) {
@@ -34,6 +60,21 @@ function validateEditUser(req, res, next) {
   }
   next();
 }
+
+/**
+ * Middleware to validate request body for creating a new user.
+ *
+ * Validation schema (`newUserSchema`):
+ * - `nameUser`:             Optional string (max 100 characters).
+ * - `email`:                Optional, valid email address.
+ * - `password`:             Optional, trimmed string (1–256 characters).
+ * - `code`:                 Optional, alphanumeric string (2–20 characters).
+ * - `additionalInformation`: Optional string.
+ *
+ * If validation fails:
+ * - Responds with HTTP 400 and a descriptive validation error message.
+ */
+
 function validateNewUser(req, res, next) {
   const { error } = newUserSchema.validate(req.body);
   if (error) {

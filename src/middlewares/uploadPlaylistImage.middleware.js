@@ -48,6 +48,30 @@ const storage = multer.diskStorage({
   },
 });
 
+/**
+ * Multer-based middleware to handle temporary image uploads for playlists.
+ *
+ * Features:
+ * - Only accepts image files of the following MIME types:
+ *   - image/jpeg (.jpg)
+ *   - image/png  (.png)
+ *   - image/webp (.webp)
+ *   - image/heic (.heic)
+ *   - image/heif (.heif)
+ *
+ * - Files are temporarily stored in a system-generated directory using `tmp.dirSync()`.
+ *   - The temporary directory path is attached to `req._tmpDirPath`.
+ *   - The generated filename is attached to `req._uploadedFileName`.
+ *
+ * - Maximum upload size: 20MB.
+ * - Destination folder path is loaded from `process.env.PLAYLIST_IMAGE_PATH_JS`.
+ *   If it does not exist, it is created recursively at initialization.
+ *
+ * Notes:
+ * - Logs the MIME type to console in development environment if enabled via `process.env.ENVIROMENT`.
+ * - Returns 500 or 400 errors via Multer if validation fails (e.g., unsupported MIME type).
+ */
+
 const upload = multer({
   storage,
   fileFilter,

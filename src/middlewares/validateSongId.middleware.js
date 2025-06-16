@@ -2,6 +2,23 @@ const Joi = require("joi");
 const { getSongById } = require("../repositories/song.repository");
 const { NotFoundError } = require("../repositories/exceptions/song.exceptions");
 
+/**
+ * Middleware to validate the song ID in the request parameters.
+ * 
+ * Validates that `idsong` parameter is a positive integer.
+ * Then attempts to retrieve the song from the database using `getSongById`.
+ * 
+ * If validation fails, responds with HTTP 400 (Bad Request) and an error message.
+ * If the song is not found, responds with HTTP 404 (Not Found).
+ * If any other error occurs, responds with HTTP 500 (Internal Server Error).
+ * 
+ * On success, attaches the song object to `req.song` and calls `next()`.
+ * 
+ * @param {Object} req - Express request object; expects `req.params.idsong`
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ */
+
 async function validateSongId(req, res, next) {
   const schema = Joi.object({
     idsong: Joi.number().integer().positive().required(),

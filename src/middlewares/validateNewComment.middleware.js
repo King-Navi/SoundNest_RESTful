@@ -12,6 +12,20 @@ const newCommentSchema = Joi.object({
   }),
 });
 
+/**
+ * Middleware to validate the request body for creating a new comment.
+ *
+ * Expected request body structure:
+ * - `song_id`: A required numeric value identifying the associated song.
+ * - `message`: A required text string (maximum 500 characters) representing the comment content.
+ *
+ * If the validation fails:
+ * - Responds with HTTP 400 and the first validation error message.
+ *
+ * If the validation passes:
+ * - Proceeds to the next middleware or route handler.
+ */
+
 function validateNewComment(req, res, next) {
   const { error } = newCommentSchema.validate(req.body);
   if (error) {

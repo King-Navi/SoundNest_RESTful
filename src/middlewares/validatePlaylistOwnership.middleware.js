@@ -1,5 +1,19 @@
 const PlaylistRepository = require("../repositories/playlist.mongo.repository");
 const playlistRepo = new PlaylistRepository();
+
+/**
+ * Middleware to validate that the authenticated user owns the playlist.
+ * 
+ * Steps:
+ * - Retrieves the playlist ID from request parameters.
+ * - Fetches the playlist from the repository.
+ * - Checks if the playlist exists.
+ * - Compares the playlist's creator ID with the authenticated user's ID.
+ * - If the user is not the owner, returns HTTP 403 Forbidden.
+ * 
+ * On success, calls next() to continue request processing.
+ */
+
 async function validatePlaylistOwnership(req, res, next) {
   const { idPlaylist } = req.params;
   const idUser = req.user.id;

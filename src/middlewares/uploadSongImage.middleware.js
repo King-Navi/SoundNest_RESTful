@@ -29,6 +29,27 @@ const storage = multer.diskStorage({
   },
 });
 
+/**
+ * Multer middleware for handling temporary image uploads.
+ *
+ * Features:
+ * - Accepts only image files with the following MIME types:
+ *   - image/jpeg (.jpeg)
+ *   - image/png  (.png)
+ *   - image/jpg  (.jpg)
+ *
+ * - Files are temporarily stored in a dynamically generated directory using `tmp.dirSync()`.
+ *   - The temporary directory path is stored in `req._tmpDirPath`.
+ *   - The generated filename (UUID + original extension) is stored in `req._uploadedFileName`.
+ *
+ * - Maximum file size: 20MB.
+ * - If the uploaded file has an unsupported MIME type, a 400 error is returned by Multer.
+ *
+ * Intended use:
+ * - Pre-processing of images before moving them to permanent storage.
+ * - Optional cleanup of temporary files after processing.
+ */
+
 const upload = multer({
   storage,
   fileFilter,

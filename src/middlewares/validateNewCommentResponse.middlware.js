@@ -8,6 +8,19 @@ const newResponseSchema = Joi.object({
   }),
 });
 
+/**
+ * Middleware to validate the request body when submitting a new response.
+ *
+ * Expected structure:
+ * - `message`: Required string field, maximum 500 characters.
+ *
+ * On validation failure:
+ * - Responds with HTTP 400 (Bad Request).
+ *
+ * On success:
+ * - Proceeds to the next middleware or route handler.
+ */
+
 function validateResponseSchema(req, res, next) {
   const { error } = newResponseSchema.validate(req.body);
   if (error) {
